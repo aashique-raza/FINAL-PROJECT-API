@@ -8,6 +8,7 @@ import authRouter from './routes/auth.route.js'
 import userRouter from './routes/user.route.js'
 import cookieParser from 'cookie-parser'
 import propertyRouter from './routes/property.route.js'
+import cors from 'cors'
 
 
 const app=express()
@@ -19,6 +20,7 @@ const URL=process.env.DATABASE_URL
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(cookieParser())
+app.use(cors())
 
 
 // routes load
