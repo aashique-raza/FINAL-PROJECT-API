@@ -12,13 +12,14 @@
 
 
 const createAccount = async (req, res, next) => {
-    const { firstName,lastName, email,phoneNumber, password,profileImage } = req.body;
+    const { firstName,lastName, email,phoneNumber, password } = req.body;
   
-    if (!firstName || !lastName || !email || !phoneNumber|| !password || !profileImage) {
+    if (!firstName || !lastName || !email || !phoneNumber|| !password ) {
       return next(errorHandler(500, "All fields are required"));
     }
   
     try {
+      const mobileNumber=parseInt(phoneNumber)
      
   
       // Check if user already exists
@@ -28,7 +29,7 @@ const createAccount = async (req, res, next) => {
       }
 
     //   check phoneNumber--
-    const existPhone=await User.findOne({phoneNumber:phoneNumber})
+    const existPhone=await User.findOne({phoneNumber:mobileNumber})
     if (existPhone) {
         return next(errorHandler(403, "use another mobile number"));
       }
@@ -58,9 +59,9 @@ const createAccount = async (req, res, next) => {
         firstName,
         lastName,
         email,
-        phoneNumber,
+        phoneNumber:mobileNumber,
         password: hashedPassword,
-        profileImage
+        
       });
   
       // Save user to database
