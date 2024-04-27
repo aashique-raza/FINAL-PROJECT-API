@@ -110,9 +110,11 @@ const createAccount = async (req, res, next) => {
         process.env.JWT_SECRET_KEY
         
       );
+      // console.log(token)
+      
   
       // Set token as a cookie with name 'auth_token'
-      res.cookie("token", token, );
+      res.cookie("access_token", token,{httpOnly: true}  );
   
       const { password: pass, ...user } = userExists._doc;
   

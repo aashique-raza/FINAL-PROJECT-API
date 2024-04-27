@@ -9,6 +9,7 @@ import userRouter from './routes/user.route.js'
 import cookieParser from 'cookie-parser'
 import propertyRouter from './routes/property.route.js'
 import cors from 'cors'
+import pgRouter from './routes/pg.route.js'
 
 
 const app=express()
@@ -17,16 +18,21 @@ const PORT=process.env.PORT || 3000
 const URL=process.env.DATABASE_URL
 
 // middlewares--
+app.use(express.static('public'))
 app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(cookieParser())
-app.use(cors())
+app.use(cors({
+    origin: true, // Allows all origins
+    credentials: true // Allows cookies to be sent cross-origin
+  }))
 
 
 // routes load
 app.use('/api/auth',authRouter)
 app.use('/api/user',userRouter)
 app.use('/api/property',propertyRouter)
+app.use('/api/pg',pgRouter)
 
 
 // error handle--

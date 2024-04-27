@@ -3,18 +3,14 @@ import jwt from "jsonwebtoken";
 
 const verifyUser = async (req, res, next) => {
   let token;
+  console.log(token)
   try {
     // Extract token from cookie or request headers
-    // Extract token from cookie or request headers
-    // console.log(req.cookies.token)
-    if (req.cookies.token) {
-      token = req.cookies.token;
-    } else if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      // Remove "Bearer" scheme and extract token
-      token = req.headers.authorization.split(" ")[1];
+    console.log('yeh hai first token', req.cookies.access_token); // Corrected code
+    console.log('headers checking',req.headers.cookie)
+
+    if (req.cookies.access_token) { 
+      token=req.cookies.access_token
     }
 
     if (!token) {
@@ -22,9 +18,10 @@ const verifyUser = async (req, res, next) => {
         .status(401)
         .json({ success: false, msg: "No token provided" });
     }
+
     // Verify token
     const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    // console.log(decoded);
+    
     if (!decoded) {
       return res
         .status(401)
@@ -37,9 +34,10 @@ const verifyUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(`failed to verify user`);
-    console.log(error)
+    console.log(error.message)
     res.status(500).json({ success: false, msg: "internal server error" });
   }
 };
+
 
 export default verifyUser;
