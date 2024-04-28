@@ -34,13 +34,17 @@ const sendMail = async (user, token, flag = false) => {
       };
     } else {
       const link = `http://localhost:5173/reset-password/?id=${user._id}&&reset=${token}`;
+      const linkExpirationDescription = "Please note that this link will expire after 15 minutes.";
       // Set up email data
-      mailOptions = {
+       mailOptions = {
         from: process.env.AUTH_USER,
         to: user.email,
         subject: "Password Reset Request",
-        html: ` <a href=${link}>click here to reset your password</a>`,
-      };
+        html: `
+            <p>${linkExpirationDescription}</p>
+            <p><a href=${link}>Click here to reset your password</a></p>
+        `,
+    }
     }
 
     // Send the email
