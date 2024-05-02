@@ -119,6 +119,7 @@ const updateAccount = async (req, res, next) => {
   const sendVerifivationMail=async(req,res,next)=>{
     const { email } = req.body;
     const{userID}=req.params
+    console.log(email,userID)
 
     try {
       if(req.user.userId.trim()!==userID.trim()){
