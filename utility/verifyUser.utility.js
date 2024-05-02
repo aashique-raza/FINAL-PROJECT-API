@@ -3,11 +3,11 @@ import jwt from "jsonwebtoken";
 
 const verifyUser = async (req, res, next) => {
   let token;
-  console.log(token)
+  // console.log(token)
   try {
     // Extract token from cookie or request headers
-    console.log('yeh hai first token', req.cookies.access_token); // Corrected code
-    console.log('headers checking',req.headers.cookie)
+    // console.log('yeh hai first token', req.cookies.access_token); // Corrected code
+    // console.log('headers checking',req.headers.cookie)
 
     if (req.cookies.access_token) { 
       token=req.cookies.access_token

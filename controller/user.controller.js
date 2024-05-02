@@ -19,8 +19,9 @@ const logOut=async(req,res)=>{
 }
 
 const updateAccount = async (req, res, next) => {
-    const { firstName,lastName, email,phoneNumber, profilePicture,} = req.body;
-    console.log(firstName,lastName,email,phoneNumber,profilePicture)
+  console.log('body me data',req.body)
+    const { firstName,lastName, email,phoneNumber, profileImage,} = req.body;
+    console.log(firstName,lastName,email,phoneNumber,profileImage)
     const { userID } = req.params;
     console.log(userID)
     // console.log(profilePicture)
@@ -32,7 +33,7 @@ const updateAccount = async (req, res, next) => {
       }
 
       const check = await User.findOne({ _id: userID });
-      console.log('ye hai id',check);
+      // console.log('ye hai id',check);
   
       if (email) {
         const checkValidEmail = validateEmail(email);
@@ -51,12 +52,12 @@ const updateAccount = async (req, res, next) => {
             lastName:lastName,
             email:email,
             phoneNumber:phoneNumber,
-            profileImage: profilePicture,
+            profileImage: profileImage,
           },
         },
         { new: true }
       );
-      console.log(updatedUser)
+      // console.log(updatedUser)
   
     //   const { password: pass, ...user } = updatedUser._doc;
   
