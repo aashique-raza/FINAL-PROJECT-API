@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 const logOut=async(req,res)=>{
   try {
       // Clear the token cookie
-      res.clearCookie("token");
+      res.clearCookie("access_token");
   
       res.status(200).json({ success: true, msg: "Logged out successfully" });
     } catch (error) {
