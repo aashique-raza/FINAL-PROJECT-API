@@ -1,18 +1,15 @@
 
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
-import checkEmailVerification from '../middlewares/mailVerified.middleware.js'
-import { addPgProperty } from '../controller/pg.controller.js'
+import { createRentProperty } from '../controller/rent.controller.js'
 import multer from 'multer'
 
-const router=Router()
-// Multer Configuration
 
 
 /* Configuration Multer for File Upload */
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, "public/uploads/pg"); // Store uploaded files in the 'uploads' folder
+      cb(null, "public/uploads/rent"); // Store uploaded files in the 'uploads' folder
     },
     filename: function (req, file, cb) {
       cb(null, file.originalname); // Use the original file name
@@ -21,7 +18,10 @@ const storage = multer.diskStorage({
   const upload = multer({ storage });
 
 
-router.post('/create-listing',verifyUser,checkEmailVerification,upload.array('listingPhotos'),addPgProperty)
+const router=Router()
+
+// create rent 
+router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
 
 
 export default router
