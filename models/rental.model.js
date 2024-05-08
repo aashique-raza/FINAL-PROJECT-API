@@ -75,10 +75,11 @@ const rentSchmea = mongoose.Schema({
     type: String,
     required: true,
   },
-  // maintenanceAmount: {
-  //   type: Number,
-  //   required: false,
-  // },
+  maintenanceAmount: {
+    type: Number,
+    required: false,
+    default:0
+  },
   availableFrom: {
     type: Date,
     required: true,

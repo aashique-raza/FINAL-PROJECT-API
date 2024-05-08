@@ -4,8 +4,8 @@ import uploadImagesToCloudinary from "../utility/cloudinary.upload.js";
 import Rent from "../models/rental.model.js";
 
 const createRentProperty = async (req, res, next) => {
-  console.log("body", req.body);
-  console.log("files", req.files);
+  // console.log("body", req.body);
+  // console.log("files", req.files);
   //   return res.json({msg:"testing...."})
 
   const {
@@ -38,97 +38,110 @@ const createRentProperty = async (req, res, next) => {
     waterSupply,
   } = req.body;
 
-  //   change type number here----
 
-  // console.log(typeof propertyFloorNumber, typeof totalFloorNumber)
-  console.log(typeof maintenanceAmount, maintenanceAmount)
+  console.log(typeof electricity, typeof waterSupply)
+  console.log(electricity,waterSupply)
 
+ 
   try {
-    if (!apartmentType) {
+
+    if (bedroom==0) {
+      return next(errorHandler(403, "bedroom is required field"));
+    }
+    if (balcony==0) {
+      return next(errorHandler(403, "balcony is required field"));
+    }
+    if (guest==0) {
+      return next(errorHandler(403, "guest is required field"));
+    }
+
+   
+
+    if (apartmentType.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "apartment type ie required field"));
     }
-    if (!BHKType) {
+    if (BHKType.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "BHKType type ie required field"));
     }
-    if (!monthlyMaintenance) {
+   
+    if (monthlyMaintenance.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "monthly maintenance  is required field"));
     }
-    // if (
-    //   monthlyMaintenance.trim().toLowerCase() ===
-    //   "extraMaintenance".trim().toLocaleLowerCase()
-    // ) {
-    //   if (!maintenanceAmount) {
-    //     return next(errorHandler(403, "maintenance ammount is required field"));
-    //   }
-    // }
+    if (
+      monthlyMaintenance.trim().toLowerCase() ===
+      "extraMaintenance".trim().toLocaleLowerCase()
+    ) {
+      if (maintenanceAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
+        return next(errorHandler(403, "maintenance ammount is required field"));
+      }
+    }
 
-    if (!propertyArea) {
+     
+    if (propertyArea.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "build up area is required field"));
     }
-    if (!propertyFloor) {
+    if (propertyFloor.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "property floor is required field"));
     }
 
-    if (!totalFloor) {
+    if (totalFloor.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "total floor is required field"));
     }
 
-    if (!propertyAge) {
+    if (propertyAge.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "property age is required field"));
     }
-    if (!availableFrom) {
+  
+
+    if (availableFrom.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "available from is required field"));
     }
-    if (!depositAmount) {
+    if (depositAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "expected deposit is required field"));
     }
-    if (!description) {
+    if (description.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "description is required field"));
     }
 
-    if (!propertyAvailableFor) {
+    
+
+    if (propertyAvailableFor.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(
         errorHandler(403, "property available for is required field")
       );
     }
-    if (!rentAmount) {
+    if (rentAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "expected rent is required field"));
     }
-    if (preferedTenats.length <= 0) {
+    if (!preferedTenats ) {
       return next(errorHandler(403, "prefered tenet is required field"));
     }
-    if (!city) {
-      return next(errorHandler(403, "city is required field"));
-    }
-    if (!localAddress) {
-      return next(errorHandler(403, "local Address is required field"));
-    }
-    if (!state) {
+    if (state.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "state is required field"));
     }
-    if (!bedroom) {
-      return next(errorHandler(403, "bedroom ie required field"));
+    if (city.trim().toLocaleLowerCase()==='undefined'.trim()) {
+      return next(errorHandler(403, "city is required field"));
     }
-    if (!balcony) {
-      return next(errorHandler(403, "balcony is required field"));
+    if (localAddress.trim().toLocaleLowerCase()==='undefined'.trim()) {
+      return next(errorHandler(403, "local Address is required field"));
     }
-    if (!guest) {
-      return next(errorHandler(403, "guest is required field"));
-    }
-
-    if (!electricity) {
+   
+   
+    
+    if (electricity.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "electricity is required field"));
     }
-    if (!waterSupply) {
+    if (waterSupply.trim().toLocaleLowerCase()==='undefined'.trim()) {
       return next(errorHandler(403, "water Supply is required field"));
     }
 
+    // 
     // change string field into number
     const propertyFloorNumber = parseInt(propertyFloor);
-    // let maintenanceAmountNumber;
-    // if (maintenanceAmount) {
-    //   maintenanceAmountNumber = parseInt(maintenanceAmount);
-    // }
+    let maintenanceAmountNumber;
+    if (maintenanceAmount) {
+      maintenanceAmountNumber = parseInt(maintenanceAmount);
+    }
 
     const totalFloorNumber = parseInt(totalFloor);
     const rentAmountNUmber = parseInt(rentAmount);
@@ -143,9 +156,10 @@ const createRentProperty = async (req, res, next) => {
       );
     }
 
-    if (!req.files.length > 4) {
+    if (req.files.length <= 4) {
       return next(errorHandler(403, "please upload images at least five"));
     }
+    
     const imageUrls = await uploadImagesToCloudinary(
       req.files,
       req.user.userId
@@ -153,7 +167,7 @@ const createRentProperty = async (req, res, next) => {
 
     // console.log(imageUrls);
     if (!imageUrls.length > 0) {
-      return next(errorHandler(500, "internal server error"));
+      return next(errorHandler(500, "image upload failed"));
     }
     const createNewProperty = new Rent({
       owner: req.user.userId,
@@ -170,13 +184,13 @@ const createRentProperty = async (req, res, next) => {
       totalFloor: totalFloorNumber,
       floor: propertyFloorNumber,
       builtUpArea: propertyArea,
-      apartmentName: apartmentName,
+      apartmentName,
       propertyAvailableFor: propertyAvailableFor,
       preferedTenats: preferedTenats,
       rentAmount: rentAmountNUmber,
       depositAmount: depositAMountNumber,
       monthlyMaintenance: monthlyMaintenance,
-    //   maintenanceAmount: maintenanceAmount !== undefined ? parseInt(maintenanceAmount) : null,
+      maintenanceAmount: maintenanceAmount ? maintenanceAmountNumber : 0,
 
       availableFrom: availableFrom,
       furnishing: furnishing,
