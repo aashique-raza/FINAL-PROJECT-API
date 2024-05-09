@@ -9,7 +9,7 @@ router.post('/login-account',loginAccount)
 
 router.post('/googlelogin',google)
 router.post('/forgot-paasword',forgotPassword)
-router.patch('/reset-password',resetPassword)
+router.put('/reset-password',resetPassword)
 
 
 export default router

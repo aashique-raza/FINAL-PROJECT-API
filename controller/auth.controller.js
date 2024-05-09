@@ -184,7 +184,7 @@ const forgotPassword = async (req, res, next) => {
     });
 
     const mailResult = await sendMail(findUser, token);
-    console.log(mailResult);
+    // console.log(mailResult);
 
     if (mailResult.response) {
       return res
@@ -203,7 +203,7 @@ const forgotPassword = async (req, res, next) => {
     }
   } catch (error) {
     console.log(`forgot password failed ${error.message}`);
-    next(errorHandler(500, "internal server error"));
+    next(errorHandler(500, " server error"));
   }
 };
 
@@ -238,7 +238,7 @@ const resetPassword = async (req, res, next) => {
     const hashedPassword = hashPassword(password);
     if (!hashedPassword) {
       // return next(errorHandler(500, 'Something went wrong, please try again later'));
-      return res.json({ success: false, msg: "something went wrong" });
+      return next(errorHandler(501,'something went wrong'))
     }
 
     const updateUserPass = await User.findOneAndUpdate(
