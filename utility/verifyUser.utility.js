@@ -2,30 +2,30 @@ import jwt from "jsonwebtoken";
 // import errorHandler from "../error/errorHandler";
 
 const verifyUser = async (req, res, next) => {
-  let token;
-  // console.log(token)
   try {
-    // Extract token from cookie or request headers
-    // console.log('yeh hai first token', req.cookies.access_token); // Corrected code
-    // console.log('headers checking',req.headers.cookie)
-
-    if (req.cookies.access_token) { 
-      token=req.cookies.access_token
-    }
+    // Check token in cookies or headers
+    const token =
+      req.cookies.access_token ||
+      (req.headers.authorization
+        ? req.headers.authorization.split(" ")[1]
+        : null);
 
     if (!token) {
       return res
         .status(401)
-        .json({ success: false, msg: "No token provided" });
+        .json({ success: false, msg: "unauthorized request" });
     }
 
     // Verify token
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET_KEY);
-    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
     if (!decoded) {
       return res
         .status(401)
-        .json({ success: false, msg: "Failed to authenticate token" });
+        .json({
+          success: false,
+          msg: "provided wrong token please login again",
+        });
     }
 
     // Store user information in request object for further use
@@ -34,10 +34,11 @@ const verifyUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(`failed to verify user`);
-    console.log(error.message)
-    res.status(500).json({ success: false, msg: "internal server error" });
+    console.log(error.message);
+    return res
+      .status(401)
+      .json({ success: false, msg: "Unauthorized. Please log in again." });
   }
 };
-
 
 export default verifyUser;
