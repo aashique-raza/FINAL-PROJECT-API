@@ -105,15 +105,16 @@ const loginAccount = async (req, res, next) => {
     const token = jwt.sign(
       { userId: userExists._id },
       process.env.JWT_SECRET_KEY,
-      {expiresIn:'15m'}
+      
     );
     // console.log(token)
+    // const minutesInMilliseconds = 1 * 60 * 1000; // 1 minute in milliseconds
+    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
-    const minutesInMilliseconds = 15 * 60 * 1000;
     res.cookie("access_token", token, {
       httpOnly: true,
-      maxAge :minutesInMilliseconds,
-      secure:true
+      maxAge: minutesInMilliseconds,
+      secure: true
     });
 
     const { password: pass, ...user } = userExists._doc;
