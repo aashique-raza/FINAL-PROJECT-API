@@ -49,7 +49,7 @@ const createAccount = async (req, res, next) => {
     const hashedPassword = hashPassword(password);
     if (!hashedPassword) {
       // return next(errorHandler(500, 'Something went wrong, please try again later'));
-      return res.json({ success: false, msg: "something went wrong" });
+      return next(errorHandler(501,'something went wrong'))
     }
 
     // Create new user
@@ -68,7 +68,7 @@ const createAccount = async (req, res, next) => {
   } catch (error) {
     // Handle errors
     console.log(`User signup failed ${error}`);
-    return next(errorHandler(500, "Something went wrong"));
+    return next(errorHandler(500, "server error please try later "));
   }
 };
 
@@ -103,24 +103,23 @@ const loginAccount = async (req, res, next) => {
     // Generate JWT token with user data and expiration time of 1 day
     const token = jwt.sign(
       { userId: userExists._id },
-      process.env.JWT_SECRET_KEY
+      process.env.JWT_SECRET_KEY,
+      {expiresIn:'15m'}
     );
     // console.log(token)
 
-    const cookieExpiry = new Date();
-    cookieExpiry.setDate(cookieExpiry.getDate() + 3); // Set expiry date 3 days from now
-    console.log('cookie expiray date',cookieExpiry)
 
     res.cookie("access_token", token, {
       httpOnly: true,
-      maxAge :cookieExpiry
+      maxAge :'15m',
+      secure:true
     });
 
     const { password: pass, ...user } = userExists._doc;
 
     res
       .status(201)
-      .json({ success: true, msg: "login seccessfully", user, token,tokenExpiry:cookieExpiry });
+      .json({ success: true, msg: "login seccessfully", user, token });
   } catch (error) {
     console.log(`failed login ${error}`);
     next(errorHandler(500, "internal server error"));

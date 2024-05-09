@@ -24,7 +24,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(cookieParser())
 app.use(cors({
-    origin: true, // Allows all origins
+    origin: ['http://localhost:5173'], // Allows all origins
     credentials: true // Allows cookies to be sent cross-origin
   }))
 
