@@ -74,6 +74,7 @@ const createAccount = async (req, res, next) => {
 
 const loginAccount = async (req, res, next) => {
   const { email, password } = req.body;
+  console.log(email,password)
   let number;
   try {
     if (!email || !password) {
@@ -108,10 +109,10 @@ const loginAccount = async (req, res, next) => {
     );
     // console.log(token)
 
-
+    const minutesInMilliseconds = 15 * 60 * 1000;
     res.cookie("access_token", token, {
       httpOnly: true,
-      maxAge :'15m',
+      maxAge :minutesInMilliseconds,
       secure:true
     });
 
