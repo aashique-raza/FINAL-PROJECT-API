@@ -96,9 +96,9 @@ const loginAccount = async (req, res, next) => {
     // password verify
 
     const checkPassword = await bcrypt.compare(password, userExists.password);
-    console.log(checkPassword);
+    // console.log(checkPassword);
     if (!checkPassword) {
-      return next(errorHandler(401, "username or password invalid"));
+      return next(errorHandler(401, "invalid credentials"));
     }
 
     // Generate JWT token with user data and expiration time of 1 day

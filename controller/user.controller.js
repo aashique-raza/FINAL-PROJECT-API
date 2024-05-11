@@ -114,7 +114,7 @@ const changePassword = async (req, res, next) => {
 const sendVerifivationMail = async (req, res, next) => {
   const { email } = req.body;
   const { userID } = req.params;
-  console.log(email, userID);
+  // console.log(email, userID);
 
   try {
     if (req.user.userId.trim() !== userID.trim()) {
@@ -182,7 +182,9 @@ const verifyMail = async (req, res, next) => {
     findUser.isEmailVerified = true;
     await findUser.save();
 
-    res.status(200).json({ success: true, msg: "mail verified!" });
+    const verifiedUser=await User.findOne({_id:user.trim()})
+
+    res.status(200).json({ success: true, msg: "mail verified!" ,verifiedUser});
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       // Token has expired
