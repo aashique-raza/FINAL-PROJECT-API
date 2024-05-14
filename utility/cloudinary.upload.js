@@ -28,14 +28,5 @@ const uploadImagesToCloudinary = async (files, userId) => {
 
 
 
-// uploadImagesToCloudinary(userId, images)
-//   .then(uploadedUrls => {
-//     console.log('Uploaded image URLs:', uploadedUrls);
-//     // Handle uploaded image URLs as needed
-//   })
-//   .catch(error => {
-//     // Handle error if any
-//     console.error('Error uploading images:', error);
-//   });
 
   export default uploadImagesToCloudinary
