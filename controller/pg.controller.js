@@ -2,6 +2,7 @@ import PG from "../models/pg.model.js";
 import errorHandler from "../utility/errorHandler.utility.js";
 import uploadImages from "../utility/cloudinary.upload.js";
 import uploadImagesToCloudinary from "../utility/cloudinary.upload.js";
+import { type } from "os";
 
 // next(errorHandler(403,'please fill all required field'))
 
@@ -31,11 +32,21 @@ const addPgProperty = async (req, res, next) => {
     roomFacilities,
   } = req.body;
 
-
+console.log(rentAmount,depositAmount,typeof rentAmount, typeof depositAmount)
 
   try {
     
+  
+    let rentAMountNumber;
+    let depositAmountNumber;
+    if(rentAmount){
+      rentAMountNumber=parseInt(rentAmount)
+    }
+    if(depositAmount){
+      depositAmountNumber=parseInt(depositAmount)
+    }
 
+    console.log(rentAMountNumber,depositAmountNumber)
     if(!roomSharing){
       // later on you can make a middleware an there you check all required filed
       return next(errorHandler(403,'room sharing field is required'))
@@ -65,13 +76,13 @@ const addPgProperty = async (req, res, next) => {
     if(!description ){
       return next(errorHandler(403,'dexcription field is required'))
     }
-    if(!rentAmount>0){
+    if(!rentAMountNumber>0){
       return next(errorHandler(403,'rent field is required'))
     }
-    if(!depositAmount>0){
+    if(!depositAmountNumber>0){
       return next(errorHandler(403,'deposit field is required'))
     }
-    if(rentAmount<depositAmount){
+    if(rentAMountNumber<!depositAmountNumber){
       return next(errorHandler(403,'deposit  can not be less than rent '))
     }
     if(!laundary){
