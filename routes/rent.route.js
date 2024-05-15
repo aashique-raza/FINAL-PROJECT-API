@@ -24,4 +24,5 @@ const router=Router()
 router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
 
 
+
 export default router

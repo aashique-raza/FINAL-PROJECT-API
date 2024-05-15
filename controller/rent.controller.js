@@ -217,5 +217,6 @@ const createRentProperty = async (req, res, next) => {
   }
 };
 
-export { createRentProperty };
-//
+
+
+export {createRentProperty}
