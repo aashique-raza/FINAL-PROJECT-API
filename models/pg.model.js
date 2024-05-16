@@ -33,11 +33,11 @@ const pgSchema = mongoose.Schema({
   },
   balcony: {
     required: true,
-    type: String,
+    type: Boolean,
   },
   kitchen: {
     required: true,
-    type: String,
+    type: Boolean,
   },
   depositAmount: {
     required: true,
@@ -57,11 +57,11 @@ const pgSchema = mongoose.Schema({
   },
   roomCleaning: {
     required: true,
-    type: String,
+    type: Boolean,
   },
   warden: {
     required: true,
-    type: String,
+    type: Boolean,
   },
   roomFacilities: {
     required: true,
@@ -89,7 +89,7 @@ const pgSchema = mongoose.Schema({
   },
   foodAvaibility: {
     required: true,
-    type: String,
+    type: Boolean,
   },
   foodType: {
     required: true,
@@ -98,8 +98,8 @@ const pgSchema = mongoose.Schema({
   },
   laundary: {
     required: true,
-    type: String,
-    default:'veg'
+    type: Boolean,
+    
   },
 availableFor:{
     required: true,
