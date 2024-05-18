@@ -38,104 +38,95 @@ const createRentProperty = async (req, res, next) => {
     waterSupply,
   } = req.body;
 
+  console.log(typeof electricity, typeof waterSupply);
+  console.log(electricity, waterSupply);
 
-  console.log(typeof electricity, typeof waterSupply)
-  console.log(electricity,waterSupply)
-
- 
   try {
-
-    if (bedroom==0) {
+    if (bedroom == 0) {
       return next(errorHandler(403, "bedroom is required field"));
     }
-    if (balcony==0) {
+    if (balcony == 0) {
       return next(errorHandler(403, "balcony is required field"));
     }
-    if (guest==0) {
+    if (guest == 0) {
       return next(errorHandler(403, "guest is required field"));
     }
 
-   
-
-    if (apartmentType.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (apartmentType.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "apartment type ie required field"));
     }
-    if (BHKType.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (BHKType.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "BHKType type ie required field"));
     }
-   
-    if (monthlyMaintenance.trim().toLocaleLowerCase()==='undefined'.trim()) {
+
+    if (monthlyMaintenance.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "monthly maintenance  is required field"));
     }
     if (
       monthlyMaintenance.trim().toLowerCase() ===
       "extraMaintenance".trim().toLocaleLowerCase()
     ) {
-      if (maintenanceAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
+      if (maintenanceAmount.trim().toLocaleLowerCase() === "undefined".trim()) {
         return next(errorHandler(403, "maintenance ammount is required field"));
       }
     }
 
-     
-    if (propertyArea.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (propertyArea.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "build up area is required field"));
     }
-    if (propertyFloor.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (propertyFloor.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "property floor is required field"));
     }
 
-    if (totalFloor.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (totalFloor.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "total floor is required field"));
     }
 
-    if (propertyAge.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (propertyAge.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "property age is required field"));
     }
-  
 
-    if (availableFrom.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (availableFrom.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "available from is required field"));
     }
-    if (depositAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (depositAmount.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "expected deposit is required field"));
     }
-    if (description.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (description.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "description is required field"));
     }
 
-    
-
-    if (propertyAvailableFor.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (
+      propertyAvailableFor.trim().toLocaleLowerCase() === "undefined".trim()
+    ) {
       return next(
         errorHandler(403, "property available for is required field")
       );
     }
-    if (rentAmount.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (rentAmount.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "expected rent is required field"));
     }
-    if (!preferedTenats ) {
+    if (!preferedTenats) {
       return next(errorHandler(403, "prefered tenet is required field"));
     }
-    if (state.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (state.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "state is required field"));
     }
-    if (city.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (city.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "city is required field"));
     }
-    if (localAddress.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (localAddress.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "local Address is required field"));
     }
-   
-   
-    
-    if (electricity.trim().toLocaleLowerCase()==='undefined'.trim()) {
+
+    if (electricity.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "electricity is required field"));
     }
-    if (waterSupply.trim().toLocaleLowerCase()==='undefined'.trim()) {
+    if (waterSupply.trim().toLocaleLowerCase() === "undefined".trim()) {
       return next(errorHandler(403, "water Supply is required field"));
     }
 
-    // 
+    //
     // change string field into number
     const propertyFloorNumber = parseInt(propertyFloor);
     let maintenanceAmountNumber;
@@ -159,7 +150,7 @@ const createRentProperty = async (req, res, next) => {
     if (req.files.length <= 4) {
       return next(errorHandler(403, "please upload images at least five"));
     }
-    
+
     const imageUrls = await uploadImagesToCloudinary(
       req.files,
       req.user.userId
@@ -217,6 +208,77 @@ const createRentProperty = async (req, res, next) => {
   }
 };
 
+const getRentalProperty = async (req, res, next) => {
+  // Extract query parameters from the request
+  const { bhktype, location, price,tenet,isFurnished } = req.query;
+  // console.log(isFurnished)
+
+  try {
+    let rentAmounts;
+
+    // Check if price parameter is provided
+    if (price) {
+      rentAmounts = price.split(",").map(Number);
+    }
+
+    // Construct the query object based on provided parameters
+    const query = {
+      ...(bhktype && { BHKType: bhktype }),
+      ...(location && { "location.city": location }),
+      ...(rentAmounts && rentAmounts.length === 2 && {
+        rentAmount: {
+          $gte: rentAmounts[0],
+          $lte: rentAmounts[1],
+        },
+      }),
+      ...(tenet && { preferedTenats: { $in: [tenet] } }), 
+      ...(isFurnished && { furnishing: isFurnished}), 
+      // { $elemMatch: {$eq: 'yourCategory'} }
+     
+    };
+
+    // console.log(query)
+    // Pagination: Calculate skip value based on page number
+    
+    let page=req.query.page || 1
+    // console.log(page)
+    const pageSize = 2; // Number of items per page
+    const skip = (page  - 1) * pageSize;
+
+    // Fetch rental properties with pagination
+    const rentalProperties = await Rent.find(query)
+      .skip(skip)
+      .limit(pageSize)
+      .exec();
+
+    // Check if properties are found
+    if (!rentalProperties || rentalProperties.length === 0) {
+      return next(errorHandler(404, 'No properties found'));
+    }
+
+    // Get the total count of properties to calculate total pages
+    const totalCount = await Rent.countDocuments(query).exec();
+    // console.log(totalCount)
+
+    // Calculate total pages based on total count and page size
+    const totalPages = Math.ceil(totalCount / pageSize);
+    // console.log(totalPages)
+
+    // Return response with rental properties, total pages, and current page
+    return res.json({
+      success: true,
+      msg: "Properties found",
+      rentalProperties,
+      totalPages,
+      currentPage: parseInt(page),
+    });
+  } catch (error) {
+    console.error("Error in fetching rental properties:", error.message);
+    next(errorHandler(500, 'Internal Server Error'));
+  }
+};
 
 
-export {createRentProperty}
+
+export { createRentProperty, getRentalProperty };
+
