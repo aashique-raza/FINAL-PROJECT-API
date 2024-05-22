@@ -92,7 +92,7 @@ const pgSchema = mongoose.Schema({
     type: Boolean,
   },
   foodType: {
-    required: true,
+    required: false,
     type: String,
     default:'veg'
   },
