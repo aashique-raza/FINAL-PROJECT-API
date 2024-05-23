@@ -211,7 +211,7 @@ const createRentProperty = async (req, res, next) => {
 const getRentalProperty = async (req, res, next) => {
   // Extract query parameters from the request
   const { bhktype, location, price,tenet,isFurnished } = req.query;
-  console.log(req.query)
+  // console.log(req.query)
 
   
 
@@ -281,6 +281,29 @@ const getRentalProperty = async (req, res, next) => {
 };
 
 
+const getSinglePropertyById=async(req,res,next)=>{
+  const {id}=req.params
+  try {
+    if(!id){
+      return next(errorHandler(403,'bad request'))
+    }
+  
+    
+      // Find the property by ID and populate the owner field, excluding the password
+      const findProperty = await Rent.findById(id).populate('owner', '-password');
+      
+      
+    if(!findProperty){
+      return next(errorHandler(403,'property not found'))
+    }
+    
+    res.json({success:true,msg:'property found',findProperty})
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('failed fetahcing sibgle property',error.message)
+  }
+  } 
 
-export { createRentProperty, getRentalProperty };
+
+export { createRentProperty, getRentalProperty,getSinglePropertyById };
 

@@ -1,7 +1,7 @@
 
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
-import { createRentProperty,getRentalProperty } from '../controller/rent.controller.js'
+import { createRentProperty,getRentalProperty,getSinglePropertyById } from '../controller/rent.controller.js'
 import multer from 'multer'
 
 
@@ -23,6 +23,7 @@ const router=Router()
 // create rent 
 router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
 router.get('/getRentalProperty',getRentalProperty)
+router.get('/getSingleProperty/:id',getSinglePropertyById)
 
 
 
