@@ -160,11 +160,11 @@ const getAllproperty = async (req, res, next) => {
     food_avaibility,
     food_type,
     location,
-    page
+    
   } = req.query;
   console.log(req.query);
 
-  return res.json({msg:'data aa rha hai'})
+  // return res.json({msg:'data aa rha hai'})
   try {
     let pg_rent;
 
@@ -186,22 +186,24 @@ const getAllproperty = async (req, res, next) => {
             $lte: pg_rent[1],
           },
         }),
-      ...(food_avaibility && { foodAvaibility: food_avaibility }),
+      ...(food_avaibility && { foodAvaibility: food_avaibility==='true'?true:false }),
       ...(food_type && { foodType: food_type }),
     };
 
+    console.log('query',query)
+
     // Pagination: Calculate skip value based on page number
 
-    let page = req.query.page || 1;
+    let page = parseInt(req.query.page) || 1;
     // console.log(page)
     const pageSize = 2; // Number of items per page
     const skip = (page - 1) * pageSize;
 
     // Fetch rental properties with pagination
-    const pgProperties = await PG.find(query).skip(skip).limit(pageSize).exec();
+    const properties = await PG.find(query).skip(skip).limit(pageSize).exec();
 
     // Check if properties are found
-    if (!pgProperties || pgProperties.length === 0) {
+    if (!properties || properties.length === 0) {
       return next(errorHandler(404, "No properties found"));
     }
     // Get the total count of properties to calculate total pages
@@ -216,7 +218,7 @@ const getAllproperty = async (req, res, next) => {
     return res.json({
       success: true,
       msg: "Properties found",
-      pgProperties,
+      properties,
       totalPages,
       currentPage: parseInt(page),
     });

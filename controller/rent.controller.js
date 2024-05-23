@@ -246,7 +246,7 @@ const getRentalProperty = async (req, res, next) => {
     const skip = (page  - 1) * pageSize;
 
     // Fetch rental properties with pagination
-    const rentalProperties = await Rent.find(query)
+    const properties = await Rent.find(query)
       .skip(skip)
       .limit(pageSize)
       .exec();
@@ -268,7 +268,7 @@ const getRentalProperty = async (req, res, next) => {
     return res.json({
       success: true,
       msg: "Properties found",
-      rentalProperties,
+      properties,
       totalPages,
       currentPage: parseInt(page),
     });
