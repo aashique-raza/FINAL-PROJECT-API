@@ -211,7 +211,9 @@ const createRentProperty = async (req, res, next) => {
 const getRentalProperty = async (req, res, next) => {
   // Extract query parameters from the request
   const { bhktype, location, price,tenet,isFurnished } = req.query;
-  // console.log(isFurnished)
+  console.log(req.query)
+
+  
 
   try {
     let rentAmounts;
@@ -233,11 +235,11 @@ const getRentalProperty = async (req, res, next) => {
       }),
       ...(tenet && { preferedTenats: { $in: [tenet] } }), 
       ...(isFurnished && { furnishing: isFurnished}), 
-      // { $elemMatch: {$eq: 'yourCategory'} }
+     
      
     };
 
-    // console.log(query)
+  
     // Pagination: Calculate skip value based on page number
     
     let page=req.query.page || 1
@@ -252,7 +254,7 @@ const getRentalProperty = async (req, res, next) => {
       .exec();
 
     // Check if properties are found
-    if (!rentalProperties || rentalProperties.length === 0) {
+    if (!properties || properties.length === 0) {
       return next(errorHandler(404, 'No properties found'));
     }
 
