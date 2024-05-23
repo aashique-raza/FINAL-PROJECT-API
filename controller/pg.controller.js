@@ -162,7 +162,7 @@ const getAllproperty = async (req, res, next) => {
     location,
     
   } = req.query;
-  console.log(req.query);
+  // console.log(req.query);
 
   // return res.json({msg:'data aa rha hai'})
   try {
@@ -228,4 +228,27 @@ const getAllproperty = async (req, res, next) => {
   }
 };
 
-export { addPgProperty, getAllproperty };
+const getSinglePropertyById=async(req,res,next)=>{
+const {id}=req.params
+try {
+  if(!id){
+    return next(errorHandler(403,'bad request'))
+  }
+
+  
+    // Find the property by ID and populate the owner field, excluding the password
+    const findProperty = await PG.findById(id).populate('owner', '-password');
+    
+    
+  if(!findProperty){
+    return next(errorHandler(403,'property not found'))
+  }
+  
+  res.json({success:true,msg:'property found',findProperty})
+} catch (error) {
+  next(errorHandler(500,'internal server error'))
+  console.log('failed fetahcing sibgle property',error.message)
+}
+}
+
+export { addPgProperty, getAllproperty,getSinglePropertyById };
