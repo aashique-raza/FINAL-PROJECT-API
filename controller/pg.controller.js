@@ -162,8 +162,9 @@ const getAllproperty = async (req, res, next) => {
     location,
     page
   } = req.query;
-  console.log(food_type);
+  console.log(req.query);
 
+  return res.json({msg:'data aa rha hai'})
   try {
     let pg_rent;
 
