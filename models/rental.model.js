@@ -112,6 +112,10 @@ const rentSchmea = mongoose.Schema({
     type:Number,
     required:true
   },
+  bathroom:{
+    type:Number,
+    required:true
+  },
   electricity:{
     type:String,
     required:true

@@ -32,6 +32,7 @@ const createRentProperty = async (req, res, next) => {
     state,
     bedroom,
     balcony,
+    bathroom,
     guest,
     availableAmenities,
     electricity,
@@ -50,6 +51,9 @@ const createRentProperty = async (req, res, next) => {
     }
     if (guest == 0) {
       return next(errorHandler(403, "guest is required field"));
+    }
+    if(bathroom==0){
+      return next(errorHandler(403, "bathroom is required field"));
     }
 
     if (apartmentType.trim().toLocaleLowerCase() === "undefined".trim()) {
@@ -140,6 +144,7 @@ const createRentProperty = async (req, res, next) => {
     const bedroomCount = parseInt(bedroom);
     const balconyCount = parseInt(balcony);
     const guestCount = parseInt(guest);
+    const bathroomCount=parseInt(bathroom)
 
     if (propertyFloorNumber > totalFloorNumber) {
       return next(
@@ -189,6 +194,7 @@ const createRentProperty = async (req, res, next) => {
       description: description,
 
       bedroom: bedroomCount,
+      bathroom:bathroomCount,
       balcony: balconyCount,
       guest: guestCount,
       electricity: electricity,
