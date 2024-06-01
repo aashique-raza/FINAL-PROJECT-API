@@ -341,17 +341,29 @@ const getAllproperty = async (req, res, next) => {
 
 const getUserProperty=async(req,res,next)=>{
   const {userid}=req.params;
+  const{type}=req.query
   try {
     if(userid!==req.user.userId){
       next(errorHandler(403,'bad request! you need to send corret user'))
     }
+    let property;
+    let totalDocument;
 
-    const property=await Rent.find({owner:userid})
+    if(type){
+      property=await Rent.find({owner:userid,propertyAvailableFor:type})
+      totalDocument=await Rent.countDocuments({owner:userid,propertyAvailableFor:type})
+    }else{
+      property=await Rent.find({owner:userid})
+      totalDocument=await Rent.countDocuments()
+
+    }
+
+     
     if(!property || !property.length>0){
       next(errorHandler(404,'property not found'))
     }
 
-    res.json({success:true,msg:"property found",property})
+    res.json({success:true,msg:"property found",property,totalDocument})
     
   } catch (error) {
     next(errorHandler(500,'internal server error'))
