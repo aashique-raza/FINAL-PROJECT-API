@@ -2,7 +2,7 @@
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
 import checkEmailVerification from '../middlewares/mailVerified.middleware.js'
-import { addPgProperty,getAllproperty,getSinglePropertyById,getProperty } from '../controller/pg.controller.js'
+import { addPgProperty,getAllproperty,getSinglePropertyById,getProperty,getUserProperty } from '../controller/pg.controller.js'
 import multer from 'multer'
 
 const router=Router()
@@ -21,10 +21,14 @@ const storage = multer.diskStorage({
   const upload = multer({ storage });
 
 
-router.post('/create-listing',verifyUser,checkEmailVerification,upload.array('listingPhotos'),addPgProperty)
+
 router.get('/getPgProperty',getAllproperty)
 router.get('/getSingleProperty/:id',getSinglePropertyById)
 router.get('/allProperty',getProperty)
+
+// proetected route
+router.post('/create-listing',verifyUser,checkEmailVerification,upload.array('listingPhotos'),addPgProperty)
+router.get('/getUserProperty/:userid',verifyUser,getUserProperty)
 
 
 export default router

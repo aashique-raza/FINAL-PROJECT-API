@@ -272,5 +272,25 @@ const getProperty = async (req, res, next) => {
   }
 };
 
+const getUserProperty=async(req,res,next)=>{
+  const {userid}=req.params;
+  try {
+    if(userid!==req.user.userId){
+      next(errorHandler(403,'bad request! you need to send corret user'))
+    }
 
-export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty };
+    const property=await PG.find({owner:userid})
+    if(!property || !property.length>0){
+      next(errorHandler(404,'property not found'))
+    }
+
+    res.json({success:true,msg:"property found",property})
+    
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('get user property failed',error)
+  }
+}
+
+
+export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty };
