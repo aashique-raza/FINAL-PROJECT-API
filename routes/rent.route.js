@@ -1,8 +1,9 @@
 
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
-import { createRentProperty,getRentalProperty,getSinglePropertyById,getAllproperty } from '../controller/rent.controller.js'
+import { createRentProperty,getRentalProperty,getSinglePropertyById,getAllproperty,getUserProperty } from '../controller/rent.controller.js'
 import multer from 'multer'
+// import { getUserProperty } from '../controller/pg.controller.js';
 // import { getAllproperty } from '../controller/pg.controller.js';
 
 
@@ -22,11 +23,14 @@ const storage = multer.diskStorage({
 const router=Router()
 
 // create rent 
-router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
+
 router.get('/getRentalProperty',getRentalProperty)
 router.get('/getSingleProperty/:id',getSinglePropertyById)
 router.get('/property',getAllproperty)
 
+// protected route---
+router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
+router.get('/getUserProperty/:userid',verifyUser,getUserProperty)
 
 
 export default router
