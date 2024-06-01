@@ -52,7 +52,7 @@ const createRentProperty = async (req, res, next) => {
     if (guest == 0) {
       return next(errorHandler(403, "guest is required field"));
     }
-    if(bathroom==0){
+    if (bathroom == 0) {
       return next(errorHandler(403, "bathroom is required field"));
     }
 
@@ -144,7 +144,7 @@ const createRentProperty = async (req, res, next) => {
     const bedroomCount = parseInt(bedroom);
     const balconyCount = parseInt(balcony);
     const guestCount = parseInt(guest);
-    const bathroomCount=parseInt(bathroom)
+    const bathroomCount = parseInt(bathroom);
 
     if (propertyFloorNumber > totalFloorNumber) {
       return next(
@@ -194,7 +194,7 @@ const createRentProperty = async (req, res, next) => {
       description: description,
 
       bedroom: bedroomCount,
-      bathroom:bathroomCount,
+      bathroom: bathroomCount,
       balcony: balconyCount,
       guest: guestCount,
       electricity: electricity,
@@ -216,10 +216,8 @@ const createRentProperty = async (req, res, next) => {
 
 const getRentalProperty = async (req, res, next) => {
   // Extract query parameters from the request
-  const { bhktype, location, price,tenet,isFurnished } = req.query;
+  const { bhktype, location, price, tenet, isFurnished } = req.query;
   // console.log(req.query)
-
-  
 
   try {
     let rentAmounts;
@@ -233,35 +231,30 @@ const getRentalProperty = async (req, res, next) => {
     const query = {
       ...(bhktype && { BHKType: bhktype }),
       ...(location && { "location.city": location }),
-      ...(rentAmounts && rentAmounts.length === 2 && {
-        rentAmount: {
-          $gte: rentAmounts[0],
-          $lte: rentAmounts[1],
-        },
-      }),
-      ...(tenet && { preferedTenats: { $in: [tenet] } }), 
-      ...(isFurnished && { furnishing: isFurnished}), 
-     
-     
+      ...(rentAmounts &&
+        rentAmounts.length === 2 && {
+          rentAmount: {
+            $gte: rentAmounts[0],
+            $lte: rentAmounts[1],
+          },
+        }),
+      ...(tenet && { preferedTenats: { $in: [tenet] } }),
+      ...(isFurnished && { furnishing: isFurnished }),
     };
 
-  
     // Pagination: Calculate skip value based on page number
-    
-    let page=req.query.page || 1
+
+    let page = req.query.page || 1;
     // console.log(page)
     const pageSize = 2; // Number of items per page
-    const skip = (page  - 1) * pageSize;
+    const skip = (page - 1) * pageSize;
 
     // Fetch rental properties with pagination
-    const properties = await Rent.find(query)
-      .skip(skip)
-      .limit(pageSize)
-      .exec();
+    const properties = await Rent.find(query).skip(skip).limit(pageSize).exec();
 
     // Check if properties are found
     if (!properties || properties.length === 0) {
-      return next(errorHandler(404, 'No properties found'));
+      return next(errorHandler(404, "No properties found"));
     }
 
     // Get the total count of properties to calculate total pages
@@ -282,34 +275,57 @@ const getRentalProperty = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Error in fetching rental properties:", error.message);
-    next(errorHandler(500, 'Internal Server Error'));
+    next(errorHandler(500, "Internal Server Error"));
   }
 };
 
-
-const getSinglePropertyById=async(req,res,next)=>{
-  const {id}=req.params
+const getSinglePropertyById = async (req, res, next) => {
+  const { id } = req.params;
   try {
-    if(!id){
-      return next(errorHandler(403,'bad request'))
+    if (!id) {
+      return next(errorHandler(403, "bad request"));
     }
-  
-    
-      // Find the property by ID and populate the owner field, excluding the password
-      const findProperty = await Rent.findById(id).populate('owner', '-password');
-      
-      
-    if(!findProperty){
-      return next(errorHandler(403,'property not found'))
+
+    // Find the property by ID and populate the owner field, excluding the password
+    const findProperty = await Rent.findById(id).populate("owner", "-password");
+
+    if (!findProperty) {
+      return next(errorHandler(403, "property not found"));
     }
-    
-    res.json({success:true,msg:'property found',findProperty})
+
+    res.json({ success: true, msg: "property found", findProperty });
   } catch (error) {
-    next(errorHandler(500,'internal server error'))
-    console.log('failed fetahcing sibgle property',error.message)
+    next(errorHandler(500, "internal server error"));
+    console.log("failed fetahcing sibgle property", error.message);
   }
-  } 
+};
 
+const getAllproperty = async (req, res, next) => {
+  try {
+    const { type } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
 
-export { createRentProperty, getRentalProperty,getSinglePropertyById };
+    let rentListings;
+    if (type) {
+      rentListings = await Rent.find({
+        propertyAvailableFor: type.trim().toLocaleLowerCase(),
+      })
+        .skip(skip)
+        .limit(limit)
+        .populate("owner");
+    } else {
+      rentListings = await Rent.find()
+        .skip(skip)
+        .limit(limit)
+        .populate("owner");
+    }
+    res.json({ success: true, msg: "property found", rentListings });
+  } catch (error) {
+    console.log("get all property failed", error.message);
+    next(errorHandler(500, "internal server error"));
+  }
+};
 
+export { createRentProperty, getRentalProperty, getSinglePropertyById,getAllproperty };
