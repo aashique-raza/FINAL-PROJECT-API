@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 const verifyUser = async (req, res, next) => {
   try {
     // Check token in cookies or headers
+    
     const token =
       req.cookies.access_token ||
       (req.headers.authorization
