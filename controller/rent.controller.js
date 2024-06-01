@@ -308,6 +308,8 @@ const getAllproperty = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     let rentListings;
+    let totalLength;
+
     if (type) {
       rentListings = await Rent.find({
         propertyAvailableFor: type.trim().toLocaleLowerCase(),
@@ -315,17 +317,27 @@ const getAllproperty = async (req, res, next) => {
         .skip(skip)
         .limit(limit)
         .populate("owner");
+
+      totalLength = await Rent.countDocuments({
+        propertyAvailableFor: type.trim().toLocaleLowerCase(),
+      });
     } else {
       rentListings = await Rent.find()
         .skip(skip)
         .limit(limit)
         .populate("owner");
+
+      totalLength = await Rent.countDocuments();
     }
-    res.json({ success: true, msg: "property found", rentListings });
+
+    const totalPages = Math.ceil(totalLength / limit);
+
+    res.json({ success: true, msg: "Property found", rentListings, totalPages, totalLength });
   } catch (error) {
-    console.log("get all property failed", error.message);
-    next(errorHandler(500, "internal server error"));
+    console.error("Get all property failed", error.message);
+    next(errorHandler(500, "Internal server error"));
   }
 };
+
 
 export { createRentProperty, getRentalProperty, getSinglePropertyById,getAllproperty };

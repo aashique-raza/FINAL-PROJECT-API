@@ -257,13 +257,20 @@ const getProperty = async (req, res, next) => {
     const limit = 5;
     const skip = (page - 1) * limit;
 
+    // Fetching total length of PG collection
+    const totalLength = await PG.countDocuments();
+
+    // Calculating total pages
+    const totalPages = Math.ceil(totalLength / limit);
+
     const property = await PG.find().skip(skip).limit(limit).populate('owner');
 
-    res.json({ success: true, msg: 'Property found', property });
+    res.json({ success: true, msg: 'Property found', property, totalPages, totalLength });
   } catch (error) {
     console.error('Property fetch failed:', error.message);
     next(errorHandler(500, 'Internal server error'));
   }
 };
+
 
 export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty };
