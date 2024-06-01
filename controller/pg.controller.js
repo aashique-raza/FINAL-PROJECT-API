@@ -251,4 +251,19 @@ try {
 }
 }
 
-export { addPgProperty, getAllproperty,getSinglePropertyById };
+const getProperty = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const property = await PG.find().skip(skip).limit(limit).populate('owner');
+
+    res.json({ success: true, msg: 'Property found', property });
+  } catch (error) {
+    console.error('Property fetch failed:', error.message);
+    next(errorHandler(500, 'Internal server error'));
+  }
+};
+
+export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty };
