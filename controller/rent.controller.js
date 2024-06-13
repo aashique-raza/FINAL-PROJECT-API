@@ -374,7 +374,7 @@ const getUserProperty=async(req,res,next)=>{
 
 const updateProperty=async(req,res,next)=>{
   const{id,userid}=req.params
-  console.log('userid',userid,'property id',id)
+ 
   const {
     apartmentName,
   apartmentType,
@@ -403,21 +403,69 @@ const updateProperty=async(req,res,next)=>{
   electricity,
   waterSupply,
   preferedTenats,
-  availableAmenities
+  availableAmenities,
+  images
   } = req.body;
 
-  console.log(req.body)
-  
-console.log(req.files)
+  console.log(bathroom)
 
   try {
     if(userid!==req.user.userId){
       next(errorHandler(403,'bad request'))
     }
 
+  
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      imageUrls = await uploadImagesToCloudinary(req.files, req.user.userId);
+      if (imageUrls.length === 0) {
+        return next(errorHandler(500, 'Image upload failed'));
+      }
+    }
+
+
+    // console.log(imageUrls);
     
 
-    res.json({msg:'testing'})
+    const combineAllImages = [...(images || []), ...imageUrls];
+
+
+    const updateData = await Rent.findByIdAndUpdate(id, {
+      $set: {
+        apartmentType,
+        BHKType,
+        propertyAge,
+        facing: propertyFacing,
+        totalFloor: parseInt(totalFloor, 10),
+        floor: parseInt(propertyFloor, 10),
+        builtUpArea: parseInt(propertyArea, 10),
+        apartmentName,
+        propertyAvailableFor,
+        preferedTenats,
+        rentAmount: parseInt(rentAmount, 10),
+        depositAmount: parseInt(depositAmount, 10),
+        monthlyMaintenance,
+        maintenanceAmount: parseInt(maintenanceAmount, 10),
+        availableFrom,
+        furnishing,
+        parking,
+        description,
+        location: {
+          state,
+          city,
+          localAddress
+        },
+        bedroom: parseInt(bedroom, 10),
+        balcony: parseInt(balcony, 10),
+        guest: parseInt(guest, 10),
+        bathroom: bathroom === undefined ? 0 : isNaN(parseInt(bathroom, 10)) ? 0 : parseInt(bathroom, 10),
+        electricity,
+        waterSupply,
+        availableAmenities,
+        images: combineAllImages
+      }
+    }, { new: true });
+    res.json({msg:'update successfully',success:true,property:updateData})
     
   } catch (error) {
     next(errorHandler(500,'internal server error'))
