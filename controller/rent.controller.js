@@ -372,5 +372,58 @@ const getUserProperty=async(req,res,next)=>{
 
 }
 
+const updateProperty=async(req,res,next)=>{
+  const{id,userid}=req.params
+  console.log('userid',userid,'property id',id)
+  const {
+    apartmentName,
+  apartmentType,
+  BHKType,
+  propertyArea,
+  propertyFacing,
+  propertyFloor,
+  propertyAge,
+  totalFloor,
+  availableFrom,
+  depositAmount,
+  description,
+  furnishing,
+  maintenanceAmount,
+  monthlyMaintenance,
+  parking,
+  propertyAvailableFor,
+  rentAmount,
+  city,
+  localAddress,
+  state,
+  bedroom,
+  balcony,
+  guest,
+  bathroom,
+  electricity,
+  waterSupply,
+  preferedTenats,
+  availableAmenities
+  } = req.body;
 
-export { createRentProperty, getRentalProperty, getSinglePropertyById,getAllproperty,getUserProperty };
+  console.log(req.body)
+  
+console.log(req.files)
+
+  try {
+    if(userid!==req.user.userId){
+      next(errorHandler(403,'bad request'))
+    }
+
+    
+
+    res.json({msg:'testing'})
+    
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('property updating failed',error)
+  }
+}
+
+
+export { createRentProperty, getRentalProperty, getSinglePropertyById,getAllproperty,getUserProperty,updateProperty };

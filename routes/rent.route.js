@@ -1,7 +1,7 @@
 
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
-import { createRentProperty,getRentalProperty,getSinglePropertyById,getAllproperty,getUserProperty } from '../controller/rent.controller.js'
+import { createRentProperty,getRentalProperty,getSinglePropertyById,getAllproperty,getUserProperty, updateProperty } from '../controller/rent.controller.js'
 import multer from 'multer'
 // import { getUserProperty } from '../controller/pg.controller.js';
 // import { getAllproperty } from '../controller/pg.controller.js';
@@ -31,6 +31,7 @@ router.get('/property',getAllproperty)
 // protected route---
 router.post('/create',verifyUser,upload.array('listingPhotos'),createRentProperty)
 router.get('/getUserProperty/:userid',verifyUser,getUserProperty)
+router.put('/propertyUpdate/:id/:userid',verifyUser,upload.array('editPhotos'),updateProperty)
 
 
 export default router
