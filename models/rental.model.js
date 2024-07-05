@@ -114,7 +114,7 @@ const rentSchmea = mongoose.Schema({
   },
   bathroom:{
     type:Number,
-    required:true
+    required:false
   },
   electricity:{
     type:String,
@@ -131,6 +131,10 @@ const rentSchmea = mongoose.Schema({
   images:{
     type:Array,
     required:true
+  },
+  isPropertyActive:{
+    type:Boolean,
+    default:false
   }
 });
 

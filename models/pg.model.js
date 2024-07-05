@@ -111,6 +111,10 @@ availableFor:{
     type: String,
     default:' '
   },
+  isPropertyActive:{
+    type:Boolean,
+    default:false
+  }
 
 });
 

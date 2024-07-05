@@ -175,6 +175,7 @@ const getAllproperty = async (req, res, next) => {
 
     // Construct the query object based on provided parameters
     const query = {
+      isPropertyActive: true, // Ensure only active properties are queried
       ...(room_sharing && { roomSharing: room_sharing }),
       ...(location && { "location.city": location }),
       ...(available_for && { availableFor: available_for }),
@@ -407,7 +408,38 @@ const handleDeleteProperty=async(req,res,next)=>{
 
 }
 
+const handleActivationProperty = async (req, res, next) => {
+  const { propertyId, userid } = req.params;
 
-export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty,handleDeleteProperty };
+  try {
+    // Check if the user ID from the params matches the authenticated user ID
+    if (userid !== req.user.userId) {
+      return next(errorHandler(403, 'User unauthenticated'));
+    }
+
+    // Find the property by ID
+    const findProperty = await PG.findById(propertyId);
+
+    // Check if the property exists
+    if (!findProperty) {
+      return next(errorHandler(404, 'Property not found'));
+    }
+
+    // Toggle the property's active state
+    findProperty.isPropertyActive = !findProperty.isPropertyActive;
+
+    // Save the property
+    await findProperty.save();
+
+    // Respond with success message
+    return res.json({ msg: 'Activated successfully', success: true });
+  } catch (error) {
+    console.log('Property activation failed', error.message);
+    return next(errorHandler(500, 'Internal server error'));
+  }
+};
+
+
+export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty,handleDeleteProperty,handleActivationProperty };
 
 
