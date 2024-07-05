@@ -229,6 +229,7 @@ const getRentalProperty = async (req, res, next) => {
 
     // Construct the query object based on provided parameters
     const query = {
+      isPropertyActive: true, // Ensure only active properties are queried
       ...(bhktype && { BHKType: bhktype }),
       ...(location && { "location.city": location }),
       ...(rentAmounts &&
@@ -313,6 +314,7 @@ const getAllproperty = async (req, res, next) => {
     if (type) {
       rentListings = await Rent.find({
         propertyAvailableFor: type.trim().toLocaleLowerCase(),
+        isPropertyActive: true, // Ensure only active properties are queried
       })
         .skip(skip)
         .limit(limit)
@@ -320,14 +322,15 @@ const getAllproperty = async (req, res, next) => {
 
       totalLength = await Rent.countDocuments({
         propertyAvailableFor: type.trim().toLocaleLowerCase(),
+        isPropertyActive: true, // Ensure only active properties are queried
       });
     } else {
-      rentListings = await Rent.find()
+      rentListings = await Rent.find({ isPropertyActive: true}) // Ensure only active properties are queried})
         .skip(skip)
         .limit(limit)
         .populate("owner");
 
-      totalLength = await Rent.countDocuments();
+      totalLength = await Rent.countDocuments({isPropertyActive: true});
     }
 
     const totalPages = Math.ceil(totalLength / limit);
