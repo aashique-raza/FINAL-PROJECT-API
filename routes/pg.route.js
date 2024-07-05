@@ -2,7 +2,7 @@
 import {Router} from 'express'
 import verifyUser from '../utility/verifyUser.utility.js'
 import checkEmailVerification from '../middlewares/mailVerified.middleware.js'
-import { addPgProperty,getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty } from '../controller/pg.controller.js'
+import { addPgProperty,getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty ,handleDeleteProperty} from '../controller/pg.controller.js'
 import multer from 'multer'
 
 const router=Router()
@@ -30,6 +30,7 @@ router.get('/allProperty',getProperty)
 router.post('/create-listing',verifyUser,checkEmailVerification,upload.array('listingPhotos'),addPgProperty)
 router.get('/getUserProperty/:userid',verifyUser,getUserProperty)
 router.put('/propertyUpdate/:id/:userid',verifyUser,upload.array('editPhotos'),updateProperty)
+router.delete('/propertyDelete/:id/:userid',verifyUser,handleDeleteProperty)
 
 
 export default router

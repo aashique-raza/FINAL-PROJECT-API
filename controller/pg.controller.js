@@ -378,7 +378,36 @@ const updateProperty=async(req,res,next)=>{
 
 }
 
+const handleDeleteProperty=async(req,res,next)=>{
+  const {id,userid}=req.params;
 
-export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty };
+  try {
+    if(userid!==req.user.userId){
+      next(errorHandler(403,'user unauthenticated'))
+    }
+
+    const deleteProperty=await PG.findByIdAndDelete(id) 
+
+    if (!deleteProperty) {
+      // Property not found or already deleted
+      return next(errorHandler(404,'property not found'))
+   
+    }
+
+    // Property successfully deleted
+    res.json({msg:'delete successfully',success:true,})
+
+
+
+    
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('property deleting failed')
+  }
+
+}
+
+
+export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty,handleDeleteProperty };
 
 
