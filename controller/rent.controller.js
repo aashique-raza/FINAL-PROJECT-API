@@ -407,7 +407,7 @@ const updateProperty=async(req,res,next)=>{
   images
   } = req.body;
 
-  console.log(bathroom)
+  // console.log(bathroom)
 
   try {
     if(userid!==req.user.userId){

@@ -292,5 +292,93 @@ const getUserProperty=async(req,res,next)=>{
   }
 }
 
+const updateProperty=async(req,res,next)=>{
+  const{id,userid}=req.params
+  // console.log('id ye hai',id,'user id ye hai',userid)
+  const{
+    availableFor,
+    balcony,
+    depositAmount,
+    description,
+    doorClosingTime,
+    foodAvaibility,
+    foodType,
+    kitchen,
+    laundary,
+    city,
+    localAddress,
+    state,
+    pgOrHostelName,
+    placeAvaibility,
+    rentAmount,
+    roomCleaning,
+    roomSharing,
+    warden,
+    pgAmenities,
+    rulesForPg,
+    images,
+    facility
+  }=req.body
 
-export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty };
+
+  // console.log(req.body)
+
+  try {
+    if(userid!==req.user.userId){
+      next(errorHandler(403,'user unauthenticated'))
+    }
+
+  
+    let imageUrls = [];
+    if (req.files && req.files.length > 0) {
+      imageUrls = await uploadImagesToCloudinary(req.files, req.user.userId);
+      if (imageUrls.length === 0) {
+        return next(errorHandler(500, 'Image upload failed'));
+      }
+    }
+
+    const combineAllImages = [...(images || []), ...imageUrls];
+
+    const updateData = await PG.findByIdAndUpdate(id, {
+      $set: {
+       
+        roomSharing: roomSharing,
+        location: {
+          state,
+          city,
+          localAddress
+        },
+        balcony: balcony==='true'?true:false,
+        kitchen: kitchen==='true'?true:false,
+        depositAmount: parseInt(depositAmount),
+        rentAmount: parseInt(rentAmount),
+        pgOrHostelName: pgOrHostelName,
+        placeAvaibility: placeAvaibility,
+        roomCleaning: roomCleaning==='true'?true:false,
+        warden: warden==='true'?true:false,
+        roomFacilities: facility,
+        ameinites: pgAmenities,
+        images: combineAllImages,
+        pgRules: rulesForPg,
+        doorClosingTime: doorClosingTime,
+        foodAvaibility: foodAvaibility ==='true'?true:false,
+        foodType: foodType,
+        laundary: laundary ==='true'?true:false,
+      availableFor:availableFor,
+        description:description,
+      
+      }},{new:true})
+      res.json({msg:'update successfully',success:true,property:updateData})
+    
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('property updating failed',error)
+    
+  }
+
+}
+
+
+export { addPgProperty, getAllproperty,getSinglePropertyById,getProperty,getUserProperty,updateProperty };
+
+
