@@ -524,8 +524,17 @@ const handleActivationProperty = async (req, res, next) => {
     // Toggle the property's active state
     findProperty.isPropertyActive = !findProperty.isPropertyActive;
 
-    // Save the property
-    await findProperty.save();
+     // Save the property
+   const updatedProperty= await findProperty.save();
+   console.log(updatedProperty)
+
+   if(updatedProperty.isPropertyActive){
+// Respond with success message
+return res.json({ msg: 'Activated successfully', success: true });
+   }
+
+   res.json({msg:'Deactivated successfully',success:true})
+
 
     // Respond with success message
     return res.json({ msg: 'Activated successfully', success: true });

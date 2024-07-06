@@ -429,10 +429,17 @@ const handleActivationProperty = async (req, res, next) => {
     findProperty.isPropertyActive = !findProperty.isPropertyActive;
 
     // Save the property
-    await findProperty.save();
+   const updatedProperty= await findProperty.save();
+   console.log(updatedProperty)
 
-    // Respond with success message
-    return res.json({ msg: 'Activated successfully', success: true });
+   if(updatedProperty.isPropertyActive){
+// Respond with success message
+return res.json({ msg: 'Activated successfully', success: true });
+   }
+
+   res.json({msg:'Deactivated successfully',success:true})
+
+    
   } catch (error) {
     console.log('Property activation failed', error.message);
     return next(errorHandler(500, 'Internal server error'));
