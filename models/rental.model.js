@@ -1,5 +1,6 @@
 import mongoose, { mongo } from "mongoose";
 import User from "./user.model.js";
+import GuestUser from "./gusetUser.model.js";
 
 const locationSchema = new mongoose.Schema({
   city: {
@@ -135,7 +136,12 @@ const rentSchmea = mongoose.Schema({
   isPropertyActive:{
     type:Boolean,
     default:false
-  }
+  },
+  contactByUser: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: GuestUser, // Reference to GuestUser model
+    required: true
+}]
 });
 
 const Rent=mongoose.model('rent',rentSchmea)
