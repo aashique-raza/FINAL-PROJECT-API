@@ -139,7 +139,7 @@ const rentSchmea = mongoose.Schema({
   },
   contactByUser: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: GuestUser, // Reference to GuestUser model
+    // ref: GuestUser, // Reference to GuestUser model
     required: true
 }]
 });

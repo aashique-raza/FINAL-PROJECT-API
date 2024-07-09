@@ -11,6 +11,7 @@ import propertyRouter from './routes/property.route.js'
 import cors from 'cors'
 import pgRouter from './routes/pg.route.js'
 import rentRouter from './routes/rent.route.js'
+import GuestRouter from './routes/guestUser.route.js'
 
 
 const app=express()
@@ -35,6 +36,7 @@ app.use('/api/user',userRouter)
 app.use('/api/property',propertyRouter)
 app.use('/api/pg',pgRouter)
 app.use('/api/rent',rentRouter)
+app.use('/api/guest',GuestRouter)
 
 
 // error handle--
