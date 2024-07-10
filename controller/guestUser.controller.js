@@ -21,6 +21,8 @@ const generateOTP = () => {
 
 const verifyGuestUserEmail = async (req, res, next) => {
   const { email } = req.body;
+  console.log(req.body)
+  console.log(email)
 
   try {
     // Create a nodemailer transporter using your email service credentials
