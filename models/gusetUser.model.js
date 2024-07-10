@@ -1,25 +1,30 @@
 import mongoose from "mongoose";
-import Rental from './rental.model.js'
+import Rent from './rental.model.js'
+import PG from "./pg.model.js";
 
-const guestUser=mongoose.Schema({
-    email:{
-        type:String,
-        required:true
+const guestUserSchema = mongoose.Schema({
+    email: {
+        type: String,
+        required: true
     },
-    phoneNumber:{
-        type:Number,
-        required:true
+    phoneNumber: {
+        type: Number,
+        required: true
     },
-    contactedProperty:[{
+    contactedProperty: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref:Rental,
-        required:true
-    }]
-    
+        refPath: 'contactedPropertyModel',
+        required: true
+    }],
+    contactedPropertyModel: {
+        type: String,
+        required: true,
+        enum: ['Rent', 'PG']
+    }
+});
 
-})
 
 
-const GuestUser=mongoose.model('guestuser',guestUser)
+const GuestUser=mongoose.model('guestuser',guestUserSchema)
 
 export default GuestUser

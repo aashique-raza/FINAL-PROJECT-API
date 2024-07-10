@@ -1,13 +1,12 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 import User from "./user.model.js";
-import GuestUser from "./gusetUser.model.js";
+// import GuestUser from "./guestUser.model.js";  // Make sure the filename is correct
 
 const locationSchema = new mongoose.Schema({
   city: {
     type: String,
     required: true,
   },
-
   localAddress: {
     type: String,
     required: true,
@@ -18,12 +17,12 @@ const locationSchema = new mongoose.Schema({
   },
 });
 
-const rentSchmea = mongoose.Schema({
+const rentSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: User,
+    ref: User,  // Use the model name as a string
     required: true
-},
+  },
   apartmentType: {
     type: String,
     required: true,
@@ -79,7 +78,7 @@ const rentSchmea = mongoose.Schema({
   maintenanceAmount: {
     type: Number,
     required: false,
-    default:0
+    default: 0
   },
   availableFrom: {
     type: Date,
@@ -101,48 +100,48 @@ const rentSchmea = mongoose.Schema({
     type: locationSchema,
     required: true,
   },
-  bedroom:{
-    type:Number,
-    required:true
+  bedroom: {
+    type: Number,
+    required: true
   },
-  balcony:{
-    type:Number,
-    required:true
+  balcony: {
+    type: Number,
+    required: true
   },
-  guest:{
-    type:Number,
-    required:true
+  guest: {
+    type: Number,
+    required: true
   },
-  bathroom:{
-    type:Number,
-    required:false
+  bathroom: {
+    type: Number,
+    required: false
   },
-  electricity:{
-    type:String,
-    required:true
+  electricity: {
+    type: String,
+    required: true
   },
-  waterSupply:{
-    type:String,
-    required:true
+  waterSupply: {
+    type: String,
+    required: true
   },
-  availableAmenities:{
-    type:Array,
-    required:false
+  availableAmenities: {
+    type: Array,
+    required: false
   },
-  images:{
-    type:Array,
-    required:true
+  images: {
+    type: Array,
+    required: true
   },
-  isPropertyActive:{
-    type:Boolean,
-    default:false
+  isPropertyActive: {
+    type: Boolean,
+    default: false
   },
   contactByUser: [{
     type: mongoose.Schema.Types.ObjectId,
-    // ref: GuestUser, // Reference to GuestUser model
+    ref: 'GuestUser',  // Use the model name as a string
     required: true
-}]
+  }]
 });
 
-const Rent=mongoose.model('rent',rentSchmea)
-export default Rent
+const Rent = mongoose.model('Rent', rentSchema);
+export default Rent;
