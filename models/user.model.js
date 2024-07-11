@@ -36,6 +36,16 @@ const userSchema=mongoose.Schema({
         type: Boolean,
         default: false
     },
+    contactedProperty: [{
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'contactedPropertyModel',
+        required: false
+    }],
+    contactedPropertyModel: {
+        type: String,
+        required: false,
+        enum: ['Rent', 'PG']
+    }
    
 })
 

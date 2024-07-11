@@ -1,6 +1,6 @@
 import { Router } from "express";
 import verifyUser from "../utility/verifyUser.utility.js";
-import { updateAccount,logOut ,changePassword,sendVerifivationMail,verifyMail, deleteAccount} from "../controller/user.controller.js";
+import { updateAccount,logOut ,changePassword,sendVerifivationMail,verifyMail, deleteAccount,userGetOwnerDetails} from "../controller/user.controller.js";
 
 
 const router=Router()
@@ -15,6 +15,10 @@ router.post('/verify-mail',verifyUser,verifyMail)
 
 // delete account
 router.delete('/delete-account/:userID',verifyUser,deleteAccount)
+
+// user get owner details-----------
+
+router.get('/getOwnerDetails/:userid/:propertyid/:category',verifyUser,userGetOwnerDetails)
 
 
 

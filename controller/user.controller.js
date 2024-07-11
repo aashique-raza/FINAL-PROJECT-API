@@ -7,6 +7,51 @@ import errorHandler from "../utility/errorHandler.utility.js";
 import User from "../models/user.model.js";
 import sendMail from "../utility/mail.utility.js";
 import jwt from "jsonwebtoken";
+import Rent from "../models/rental.model.js";
+import PG from "../models/pg.model.js";
+
+
+async function senOwnerDetailsOnMail(email,owner){
+  try {
+    // Create a nodemailer transporter using your email service credentials
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      requireTLS: true,
+      auth: {
+        // TODO: replace `user` and `pass` values from <https://forwardemail.net>
+        user: process.env.AUTH_USER,
+        pass: process.env.AUTH_PASSWORD,
+      },
+    });
+
+    const otp = generateOTP();
+
+    console.log(parseInt(otp));
+
+    let mailOptions = {
+      from: process.env.AUTH_USER,
+      to: email,
+      subject: "your Request For - Owner details", // Email subject
+      html: `This is the property owner details, contact as soon as possible. Thank you. <br><br>
+             <b> Name:</b> ${owner.firstName}   ${owner.lastName}<br>
+            
+             <b>Email:</b> ${owner.email} <br>
+             <b>Phone Number:</b> ${owner.phoneNumber}`
+    };
+    
+
+    // Send the email
+    const result = await transporter.sendMail(mailOptions);
+    return result
+   
+  } catch (error) {
+    next(errorHandler(500, "internal server error"));
+    console.log("sending owner details failed", error);
+  }
+}
+
 
 const logOut = async (req, res) => {
   try {
@@ -134,15 +179,13 @@ const sendVerifivationMail = async (req, res, next) => {
     const mailResult = await sendMail(findUser, token, true);
 
     if (mailResult.response) {
-      return res
-        .status(200)
-        .json({
-          success: true,
-          mailrespons: mailResult.response,
-          msg: "verification link sent successfully",
-          id: findUser._id,
-          token: token,
-        });
+      return res.status(200).json({
+        success: true,
+        mailrespons: mailResult.response,
+        msg: "verification link sent successfully",
+        id: findUser._id,
+        token: token,
+      });
     } else {
       return res
         .status(200)
@@ -182,9 +225,11 @@ const verifyMail = async (req, res, next) => {
     findUser.isEmailVerified = true;
     await findUser.save();
 
-    const verifiedUser=await User.findOne({_id:user.trim()})
+    const verifiedUser = await User.findOne({ _id: user.trim() });
 
-    res.status(200).json({ success: true, msg: "mail verified!" ,verifiedUser});
+    res
+      .status(200)
+      .json({ success: true, msg: "mail verified!", verifiedUser });
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       // Token has expired
@@ -217,6 +262,56 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+const userGetOwnerDetails = async (req, res, next) => {
+  const { userid, propertyid, category } = req.params;
+
+  try {
+    if (req.user.userId !== userid) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    let findProperty;
+    // Find property based on category
+    if (category === "rental") {
+      findProperty = await Rent.findById(propertyid).populate("owner");
+    } else if (category === "pg") {
+      findProperty = await PG.findById(propertyid).populate("owner");
+    } else {
+      return next(errorHandler(400, "Invalid category"));
+    }
+
+    if (!findProperty) {
+      return next(errorHandler(403, "Property not found"));
+    }
+
+
+     // Find guest user by email
+  let findUser = await User.findById(userid);
+  findUser.contactedProperty.push(findProperty._id);
+  findUser.contactedPropertyModel=category === "rental" ? "Rent" : "PG"
+  await findUser.save();
+  // Update property with guest user ID
+  findProperty.contactByUser.push(findUser._id);
+  await findProperty.save();
+  
+  let { owner } = findProperty;
+  console.log("owner details", owner);
+
+  let sendingStatus = await senOwnerDetailsOnMail(findUser.email, owner);
+
+  if (!sendingStatus.response) {
+    next(errorHandler(501, "server error please try again later"));
+  }
+
+  res.json({ msg: "send owner details successfully", success: true });
+
+
+  } catch (error) {
+    next(errorHandler(500,'internal server error'))
+    console.log('user get owner details failed',error)
+  }
+};
+
+
 export {
   updateAccount,
   logOut,
@@ -224,4 +319,5 @@ export {
   sendVerifivationMail,
   verifyMail,
   deleteAccount,
+  userGetOwnerDetails,
 };
