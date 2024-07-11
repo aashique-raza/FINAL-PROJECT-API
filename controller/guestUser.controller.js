@@ -57,7 +57,7 @@ async function senOwnerDetailsOnMail(email,owner){
     return result
    
   } catch (error) {
-    next(errorHandler(500, "internal server error"));
+    // next(err(500, "internal server error"));
     console.log("sending owner details failed", error);
   }
 }

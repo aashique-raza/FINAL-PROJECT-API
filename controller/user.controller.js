@@ -9,6 +9,7 @@ import sendMail from "../utility/mail.utility.js";
 import jwt from "jsonwebtoken";
 import Rent from "../models/rental.model.js";
 import PG from "../models/pg.model.js";
+import nodemailer from "nodemailer";
 
 
 async function senOwnerDetailsOnMail(email,owner){
@@ -26,9 +27,7 @@ async function senOwnerDetailsOnMail(email,owner){
       },
     });
 
-    const otp = generateOTP();
-
-    console.log(parseInt(otp));
+  
 
     let mailOptions = {
       from: process.env.AUTH_USER,
@@ -47,7 +46,7 @@ async function senOwnerDetailsOnMail(email,owner){
     return result
    
   } catch (error) {
-    next(errorHandler(500, "internal server error"));
+    
     console.log("sending owner details failed", error);
   }
 }
@@ -302,7 +301,7 @@ const userGetOwnerDetails = async (req, res, next) => {
     next(errorHandler(501, "server error please try again later"));
   }
 
-  res.json({ msg: "send owner details successfully", success: true });
+  res.json({ msg: "check your mail,owner details sent successfully", success: true });
 
 
   } catch (error) {
