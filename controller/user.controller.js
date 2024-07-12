@@ -329,14 +329,20 @@ const addFavoriteProperty = async (req, res, next) => {
       propertyType: propertyType === 'rental' ? 'Rent' : 'PG'
     });
 
-    await user.save();
+    
     const model = propertyType === 'rental' ? Rent : PG;
-    await model.findByIdAndUpdate(propertyId, { isPropertyFavorite: true });
+   const updatedProperty= await model.findByIdAndUpdate(propertyId, { 
+      isPropertyFavorite: true,
+      $addToSet: { addFavoritesByUser: userId } // Prevents duplicates
+    },{new:true});
+
+    // console.log(updatedProperty)
 
     await user.save();
+    
 
 
-    res.json({ msg: 'Property added to favorites', user, success: true });
+    res.json({ msg: 'Property added to favorites', user, success: true,updatedProperty });
   } catch (error) {
     next(errorHandler(500, 'Internal server error'));
     console.log('Add to favorite failed', error);
