@@ -381,6 +381,46 @@ const getFavoritesProperty = async (req, res, next) => {
   }
 };
 
+const removeFavoriteProperty = async (req, res, next) => {
+  const { userId } = req.params;
+  const { propertyId, propertyType } = req.body; // propertyType should be 'Rent' or 'PG'
+
+  try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    // Remove the property from the user's favorites
+    user.userFavorites = user.userFavorites.filter(favorite => favorite.propertyId.toString() !== propertyId);
+
+    // Determine the model to use based on propertyType
+    const model = propertyType === 'rental' ? Rent : PG;
+
+    // Find the property and update its isPropertyFavorite field and remove the user from addFavoritesByUser
+    const property = await model.findById(propertyId);
+    if (property) {
+      property.isPropertyFavorite = false;
+      property.addFavoritesByUser = property.addFavoritesByUser.filter(favUserId => favUserId.toString() !== userId);
+      await property.save();
+    }
+
+    await user.save();
+
+    res.json({ msg: 'Property removed from favorites', user, success: true });
+  } catch (error) {
+    next(errorHandler(500, 'Internal server error'));
+    console.log('Remove from favorite failed', error);
+  }
+};
+
+
+
+
 
 
 
@@ -393,5 +433,6 @@ export {
   deleteAccount,
   userGetOwnerDetails,
   addFavoriteProperty,
-  getFavoritesProperty
+  getFavoritesProperty,
+  removeFavoriteProperty
 };
