@@ -2,6 +2,7 @@ import errorHandler from "../utility/errorHandler.utility.js";
 import uploadImages from "../utility/cloudinary.upload.js";
 import uploadImagesToCloudinary from "../utility/cloudinary.upload.js";
 import Rent from "../models/rental.model.js";
+import User from "../models/user.model.js";
 
 const createRentProperty = async (req, res, next) => {
   // console.log("body", req.body);
@@ -310,6 +311,8 @@ const getAllproperty = async (req, res, next) => {
 
     let rentListings;
     let totalLength;
+
+    // return res.json({msg:"aa rha hai"})
 
     if (type) {
       rentListings = await Rent.find({

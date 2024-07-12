@@ -3,6 +3,7 @@ import errorHandler from "../utility/errorHandler.utility.js";
 import uploadImages from "../utility/cloudinary.upload.js";
 import uploadImagesToCloudinary from "../utility/cloudinary.upload.js";
 import { type } from "os";
+import User from "../models/user.model.js";
 
 // next(errorHandler(403,'please fill all required field'))
 
@@ -258,9 +259,11 @@ const getProperty = async (req, res, next) => {
     const limit = 5;
     const skip = (page - 1) * limit;
 
+   
     // Fetching total length of PG collection
     const totalLength = await PG.countDocuments();
 
+    
     // Calculating total pages
     const totalPages = Math.ceil(totalLength / limit);
 

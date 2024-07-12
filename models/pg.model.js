@@ -18,11 +18,11 @@ const locationSchema = new mongoose.Schema({
   },
 });
 
-const pgSchema = mongoose.Schema({
+const pgSchema =new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
 },
   roomSharing: {
     required: true,

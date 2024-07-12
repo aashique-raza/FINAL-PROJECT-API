@@ -350,8 +350,6 @@ const addFavoriteProperty = async (req, res, next) => {
 };
 
 
-
-
 const getFavoritesProperty = async (req, res, next) => {
   const { userId } = req.params;
 
