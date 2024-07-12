@@ -144,7 +144,11 @@ const rentSchema = new mongoose.Schema({
   isPropertyFavorite: {
     type: Boolean,
     default: false
-  }
+  },
+  addFavoritesByUser: [{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
 });
 
 const Rent = mongoose.model('Rent', rentSchema);

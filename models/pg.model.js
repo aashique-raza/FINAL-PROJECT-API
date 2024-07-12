@@ -124,7 +124,11 @@ availableFor:{
 isPropertyFavorite: {
   type: Boolean,
   default: false
-}
+},
+addFavoritesByUser: [{
+  type:mongoose.Schema.Types.ObjectId,
+  ref: 'User'
+}]
 
 });
 
