@@ -20,7 +20,7 @@ const locationSchema = new mongoose.Schema({
 const rentSchema = new mongoose.Schema({
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: User,  // Use the model name as a string
+    ref: 'User',  // Use the model name as a string
     required: true
   },
   apartmentType: {

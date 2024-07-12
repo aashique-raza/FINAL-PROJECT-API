@@ -310,6 +310,68 @@ const userGetOwnerDetails = async (req, res, next) => {
   }
 };
 
+const addFavoriteProperty = async (req, res, next) => {
+  const { userId } = req.params;
+  const { propertyId, propertyType } = req.body; // propertyType should be 'Rent' or 'PG'
+
+  try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    user.userFavorites.push({
+      propertyId,
+      propertyType: propertyType === 'rental' ? 'Rent' : 'PG'
+    });
+
+    await user.save();
+
+    res.json({ msg: 'Property added to favorites', user, success: true });
+  } catch (error) {
+    next(errorHandler(500, 'Internal server error'));
+    console.log('Add to favorite failed', error);
+  }
+};
+
+
+
+
+const getFavoritesProperty = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    // Fetch all favorite properties
+    const favoriteProperties = await Promise.all(user.userFavorites.map(async (favorite) => {
+      const model = favorite.propertyType === 'Rent' ? Rent : PG;
+      const property = await model.findById(favorite.propertyId);
+      return property ? { ...property.toObject(), propertyType: favorite.propertyType } : null;
+    }));
+    console.log(favoriteProperties)
+
+    res.json({ msg: 'All properties fetched', favorites: favoriteProperties.filter(fav => fav !== null), success: true });
+  } catch (error) {
+    next(errorHandler(500, 'Internal server error'));
+    console.log('Getting favorite property failed', error);
+  }
+};
+
+
+
 
 export {
   updateAccount,
@@ -319,4 +381,6 @@ export {
   verifyMail,
   deleteAccount,
   userGetOwnerDetails,
+  addFavoriteProperty,
+  getFavoritesProperty
 };

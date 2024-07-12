@@ -1,5 +1,7 @@
 
 import mongoose from "mongoose";
+import Rent from "./rental.model.js";
+import PG from "./pg.model.js";
 
 const userSchema=mongoose.Schema({
     firstName:{
@@ -45,7 +47,20 @@ const userSchema=mongoose.Schema({
         type: String,
         required: false,
         enum: ['Rent', 'PG']
-    }
+    },
+    userFavorites: [
+        {
+          propertyId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true
+          },
+          propertyType: {
+            type: String,
+            required: true,
+            enum: ['Rent', 'PG']
+          }
+        }
+      ]
    
 })
 
