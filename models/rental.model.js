@@ -140,7 +140,11 @@ const rentSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'GuestUser',  // Use the model name as a string
     required: true
-  }]
+  }],
+  isPropertyFavorite: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const Rent = mongoose.model('Rent', rentSchema);

@@ -330,6 +330,11 @@ const addFavoriteProperty = async (req, res, next) => {
     });
 
     await user.save();
+    const model = propertyType === 'rental' ? Rent : PG;
+    await model.findByIdAndUpdate(propertyId, { isPropertyFavorite: true });
+
+    await user.save();
+
 
     res.json({ msg: 'Property added to favorites', user, success: true });
   } catch (error) {

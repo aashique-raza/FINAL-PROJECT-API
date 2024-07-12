@@ -120,7 +120,11 @@ availableFor:{
     type: mongoose.Schema.Types.ObjectId,
     ref: GuestUser, // Reference to GuestUser model
     required: true
-}]
+}],
+isPropertyFavorite: {
+  type: Boolean,
+  default: false
+}
 
 });
 
