@@ -15,7 +15,7 @@ import {
 
 const router = Router();
 
-router.post("/logout-account", verifyUser, logOut);
+router.post("/logout-account", logOut);
 router.put("/update-account/:userID", verifyUser, updateAccount);
 router.patch("/change-password/:userID", verifyUser, changePassword);
 
