@@ -24,7 +24,8 @@ const verifyUser = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log('jwt secret key',process.env.JWT_SECRET_KEY)
+    const decoded =await jwt.verify(token, process.env.JWT_SECRET_KEY);
     console.log('decoded token',decoded)
 
     if (!decoded) {
@@ -41,8 +42,8 @@ const verifyUser = async (req, res, next) => {
     // Call next middleware or route handler
     next();
   } catch (error) {
-    console.log(`failed to verify user`);
-    console.log(error.message);
+    console.log(`failed to verify user`,error);
+    // console.log(error.message);
     return res
       .status(401)
       .json({ success: false, msg: "Unauthorized. Please log in again." });
