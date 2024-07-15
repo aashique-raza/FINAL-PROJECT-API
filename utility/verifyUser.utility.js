@@ -5,12 +5,16 @@ const verifyUser = async (req, res, next) => {
   try {
     // Check token in cookies or headers
     console.log(req.headers)
+    console.log('in cookie',req.cookies.access_token)
+    console.log('in headers',req.headers.authorization)
+    console.log('token in head',req.headers.authorization.split(" "[1]))
     const token =
       req.cookies.access_token ||
       (req.headers.authorization
         ? req.headers.authorization.split(" ")[1]
         : null);
 
+        console.log(token)
     if (!token) {
       return res
         .status(401)
