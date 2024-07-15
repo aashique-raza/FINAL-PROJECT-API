@@ -16,13 +16,16 @@ const verifyUser = async (req, res, next) => {
 
         console.log(token)
     if (!token) {
-      return res
+     
+      res
         .status(401)
         .json({ success: false, msg: "unauthorized request" });
+        return 
     }
 
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    console.log('decoded token',decoded)
 
     if (!decoded) {
       return res
