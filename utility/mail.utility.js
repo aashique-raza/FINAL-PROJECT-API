@@ -20,7 +20,8 @@ const sendMail = async (user, token, flag = false) => {
     let mailOptions;
 
     if (flag) {
-      const verificationLink = `http://localhost:5173/mail-verification/?user=${user._id}&&verificationToken=${token}`;
+      // http://localhost:5173
+      const verificationLink = `https://rental-wave.vercel.app/mail-verification/?user=${user._id}&&verificationToken=${token}`;
       // Set up email data
       mailOptions = {
         from: process.env.AUTH_USER,
@@ -33,7 +34,8 @@ const sendMail = async (user, token, flag = false) => {
                 <p>If you didn't sign up for our service, please ignore this email.</p>`,
       };
     } else {
-      const link = `http://localhost:5173/reset-password/?id=${user._id}&&reset=${token}`;
+      // https://rental-wave.vercel.app/
+      const link = `https://rental-wave.vercel.app/reset-password/?id=${user._id}&&reset=${token}`;
       const linkExpirationDescription = "Please note that this link will expire after 15 minutes.";
       // Set up email data
        mailOptions = {
