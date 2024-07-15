@@ -312,7 +312,9 @@ const userGetOwnerDetails = async (req, res, next) => {
 
 const addFavoriteProperty = async (req, res, next) => {
   const { userId } = req.params;
-  const { propertyId, propertyType } = req.body; // propertyType should be 'Rent' or 'PG'
+  const { propertyId, category } = req.body; // propertyType should be 'Rent' or 'PG'
+  console.log(req.body)
+  console.log(userId)
 
   try {
     if (req.user.userId !== userId) {
@@ -326,17 +328,17 @@ const addFavoriteProperty = async (req, res, next) => {
 
     user.userFavorites.push({
       propertyId,
-      propertyType: propertyType === 'rental' ? 'Rent' : 'PG'
+      propertyType: category === 'rental' ? 'Rent' : 'PG'
     });
 
     
-    const model = propertyType === 'rental' ? Rent : PG;
+    const model = category === 'rental' ? Rent : PG;
    const updatedProperty= await model.findByIdAndUpdate(propertyId, { 
       isPropertyFavorite: true,
       $addToSet: { addFavoritesByUser: userId } // Prevents duplicates
     },{new:true});
 
-    // console.log(updatedProperty)
+    console.log(updatedProperty)
 
     await user.save();
     
@@ -382,7 +384,8 @@ const getFavoritesProperty = async (req, res, next) => {
 
 const removeFavoriteProperty = async (req, res, next) => {
   const { userId } = req.params;
-  const { propertyId, propertyType } = req.body; // propertyType should be 'Rent' or 'PG'
+  const { propertyId, category } = req.body; // propertyType should be 'Rent' or 'PG'
+  console.log(req.body)
 
   try {
     if (req.user.userId !== userId) {
@@ -398,10 +401,11 @@ const removeFavoriteProperty = async (req, res, next) => {
     user.userFavorites = user.userFavorites.filter(favorite => favorite.propertyId.toString() !== propertyId);
 
     // Determine the model to use based on propertyType
-    const model = propertyType === 'rental' ? Rent : PG;
+    const model = category === 'rental' ? Rent : PG;
 
     // Find the property and update its isPropertyFavorite field and remove the user from addFavoritesByUser
     const property = await model.findById(propertyId);
+    console.log('property',property)
     if (property) {
       property.isPropertyFavorite = false;
       property.addFavoritesByUser = property.addFavoritesByUser.filter(favUserId => favUserId.toString() !== userId);
@@ -409,6 +413,8 @@ const removeFavoriteProperty = async (req, res, next) => {
     }
 
     await user.save();
+    const newproperty = await model.findById(propertyId);
+    console.log('new property',newproperty)
 
     res.json({ msg: 'Property removed from favorites', user, success: true });
   } catch (error) {
