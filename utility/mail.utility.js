@@ -22,6 +22,7 @@ const sendMail = async (user, token, flag = false) => {
     if (flag) {
       // http://localhost:5173
       const verificationLink = `https://rental-wave.vercel.app/mail-verification/?user=${user._id}&&verificationToken=${token}`;
+      console.log('verification link',verificationLink)
       // Set up email data
       mailOptions = {
         from: process.env.AUTH_USER,
