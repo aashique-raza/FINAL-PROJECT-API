@@ -25,7 +25,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended:false}))
 app.use(cookieParser())
 app.use(cors({
-    origin: ['http://localhost:5173','https://rental-wave.vercel.app'], // Allows all origins
+    origin: ['http://localhost:5173','https://rental-wave.vercel.app','https://rental-wave-h6depmlxn-farhan-ansaris-projects.vercel.app'], // Allows all origins
     credentials: true // Allows cookies to be sent cross-origin
   }))
 
