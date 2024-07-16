@@ -21,7 +21,9 @@ const sendMail = async (user, token, flag = false) => {
 
     if (flag) {
       // http://localhost:5173
-      const verificationLink = `https://rental-wave.vercel.app/mail-verification/?user=${user._id}&&verificationToken=${token}`;
+      // https://rental-wave.vercel.app
+      // /
+      const verificationLink = `https://rental-wave-h6depmlxn-farhan-ansaris-projects.vercel.app/mail-verification/?user=${user._id}&&verificationToken=${token}`;
       console.log('verification link',verificationLink)
       // Set up email data
       mailOptions = {
@@ -36,7 +38,7 @@ const sendMail = async (user, token, flag = false) => {
       };
     } else {
       // https://rental-wave.vercel.app/
-      const link = `https://rental-wave.vercel.app/reset-password/?id=${user._id}&&reset=${token}`;
+      const link = `https://rental-wave-h6depmlxn-farhan-ansaris-projects.vercel.app/reset-password/?id=${user._id}&&reset=${token}`;
       const linkExpirationDescription = "Please note that this link will expire after 15 minutes.";
       // Set up email data
        mailOptions = {
