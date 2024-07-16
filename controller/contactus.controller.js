@@ -19,7 +19,7 @@ const handleInquiryMessage = async (req, res, next) => {
         name,
         email,
         message,
-        phone
+        mobile:phone
       });
   
       const result = await inquiry.save();
