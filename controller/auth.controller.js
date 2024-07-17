@@ -129,7 +129,8 @@ const loginAccount = async (req, res, next) => {
 };
 
 const google = async (req, res, next) => {
-  const { email, firstName, profileImage } = req.body;
+  const { email, firstName, lastName, googlePhotoUrl, isEmailVerified } = req.body;
+
   try {
     const userexists = await User.findOne({ email });
     if (userexists) {
@@ -138,28 +139,29 @@ const google = async (req, res, next) => {
         process.env.JWT_SECRET_KEY
       );
       const { password, ...user } = userexists._doc;
-      // Set cookie with HTTPOnly flag
       res.cookie("token", token, { httpOnly: true });
-      res.json({ success: true, msg: "login successfull", user });
+      return res.json({ success: true, msg: "login successfull", user,token });
     } else {
       const generatedPassword = generateRandomPassword();
-
       const hashedPassword = hashPassword(generatedPassword);
+      const defaultMobile = "0000000000"; // Default 10-digit mobile number
       const newUser = new User({
-        firstName: firstName,
+        firstName,
+        lastName,
         email,
         password: hashedPassword,
-        profilePicture: profileImage,
+        profilePicture: googlePhotoUrl,
+        isEmailVerified,
+        phoneNumber: parseInt(defaultMobile) // Set default mobile number
       });
       const savedUser = await newUser.save();
       const token = jwt.sign(
         { userId: savedUser._id },
         process.env.JWT_SECRET_KEY
       );
-      // Set cookie with HTTPOnly flag
       res.cookie("token", token, { httpOnly: true });
       const { password, ...user } = savedUser._doc;
-      res.json({ success: true, msg: "login successfull", user });
+      return res.json({ success: true, msg: "login successfull", user,token });
     }
   } catch (error) {
     console.log(`google auth failed ${error}`);
