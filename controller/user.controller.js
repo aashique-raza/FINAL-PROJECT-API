@@ -439,9 +439,9 @@ const removeFavoriteProperty = async (req, res, next) => {
 
 
 const accessRefreshToken=async (req,res,next)=>{
-  console.log('token checkinhg...',req.body)
+  // console.log('token checkinhg...',req.body)
   const  incomingRefreshToken  = req.body.refreshToken || req.cookie.refreshToken;
-  console.log('incomingRefreshToken',incomingRefreshToken)
+  // console.log('incomingRefreshToken',incomingRefreshToken)
   if (!incomingRefreshToken) {
     return next(errorHandler(403, "No refresh token provided"));
   }
@@ -465,10 +465,10 @@ const accessRefreshToken=async (req,res,next)=>{
     const newAccessToken = jwt.sign(
       { userId },
       process.env.JWT_SECRET_KEY,
-      { expiresIn: '1h' }
+      { expiresIn: '30m' }
     );
 
-    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    const minutesInMilliseconds = 30 * 60 * 1000; // 3 days in milliseconds
     res.cookie("access_token", newAccessToken, {
       httpOnly: true,
       maxAge: minutesInMilliseconds,

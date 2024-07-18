@@ -119,7 +119,7 @@ const loginAccount = async (req, res, next) => {
     await userExists.save()
 
     // Set access token in HTTP-only cookie
-    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    const minutesInMilliseconds =  2 * 60 * 1000; // 3 days in milliseconds
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       maxAge: minutesInMilliseconds,
