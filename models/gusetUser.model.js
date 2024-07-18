@@ -12,15 +12,18 @@ const guestUserSchema = mongoose.Schema({
         required: true
     },
     contactedProperty: [{
-        type: mongoose.Schema.Types.ObjectId,
-        refPath: 'contactedPropertyModel',
-        required: true
+        propertyId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true
+          },
+          propertyType: {
+            type: String,
+            required: true,
+            enum: ['Rent', 'PG']
+          }
+
     }],
-    contactedPropertyModel: {
-        type: String,
-        required: true,
-        enum: ['Rent', 'PG']
-    }
+   
 });
 
 

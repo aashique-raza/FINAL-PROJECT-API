@@ -109,13 +109,8 @@ const getOwnerDetails = async (req, res, next) => {
   const { email, mobile } = req.body;
   const { propertyId, category } = req.params;
 
-  console.log(req.body);
-  console.log(req.params);
-
   try {
     let findProperty;
-    // return res.json({msg:'data aa rha hau'})
-
     // Find property based on category
     if (category === 'rental') {
       findProperty = await Rent.findById(propertyId).populate('owner');
@@ -126,49 +121,51 @@ const getOwnerDetails = async (req, res, next) => {
     }
 
     if (!findProperty) {
-      return next(errorHandler(403, 'Property not found'));
+      return next(errorHandler(404, 'Property not found'));
     }
 
-    // Find guest user by email
-    let findUser = await GuestUser.findOne({ email: email });
+    // Find or create guest user by email
+    let findUser = await GuestUser.findOne({ email });
 
     if (findUser) {
-      // Update guest user with property ID
-      findUser.contactedProperty.push(findProperty._id);
+      // Update existing guest user with property ID
+      const alreadyContacted = findUser.contactedProperty.some(cp => cp.propertyId.equals(propertyId));
+      if (!alreadyContacted) {
+        findUser.contactedProperty.push({
+          propertyId: propertyId,
+          propertyType: category === 'rental' ? 'Rent' : 'PG'
+        });
+        findUser.phoneNumber = parseInt(mobile); // Update phone number if provided
+        await findUser.save();
+      }
     } else {
       // Create new guest user
       findUser = new GuestUser({
         email: email,
         phoneNumber: parseInt(mobile),
-        contactedProperty: [findProperty._id],
-        contactedPropertyModel: category === 'rental' ? 'Rent' : 'PG'
+        contactedProperty: [{
+          propertyId: propertyId,
+          propertyType: category === 'rental' ? 'Rent' : 'PG'
+        }]
       });
+      await findUser.save();
     }
-
-    await findUser.save();
 
     // Update property with guest user ID
     findProperty.contactByUser.push(findUser._id);
     await findProperty.save();
 
-    let {owner}=findProperty
-    console.log('owner details',owner)
+    // Send owner details to guest user via email
+    const sendingStatus = await senOwnerDetailsOnMail(findUser.email, findProperty.owner);
+    if (!sendingStatus.response) {
+      return next(errorHandler(501, 'Failed to send owner details. Please try again later.'));
+    }
 
+    res.json({ msg: 'Owner details sent successfully', success: true });
 
-   
-   let sendingStatus=await senOwnerDetailsOnMail(findUser.email,owner)
-
-   if(!sendingStatus.response){
-    next(errorHandler(501,'server error please try again later'))
-   }
-
-   res.json({msg:'send owner details successfully',success:true})
-
-
-    // return res.json({ owner: findProperty.owner });
   } catch (error) {
-    next(errorHandler(500, 'Internal server error'));
-    console.log('Get owner details failed:', error.message);
+    console.error('Get owner details failed:', error);
+    return next(errorHandler(500, 'Internal server error'));
   }
 };
 

@@ -266,8 +266,9 @@ const userGetOwnerDetails = async (req, res, next) => {
 
   try {
     if (req.user.userId !== userid) {
-      return next(errorHandler(403, "unauthorized request"));
+      return next(errorHandler(403, "Unauthorized request"));
     }
+
     let findProperty;
     // Find property based on category
     if (category === "rental") {
@@ -279,33 +280,40 @@ const userGetOwnerDetails = async (req, res, next) => {
     }
 
     if (!findProperty) {
-      return next(errorHandler(403, "Property not found"));
+      return next(errorHandler(404, "Property not found"));
     }
 
+    // Update User model with contacted property details
+    const user = await User.findById(userid);
+    if (!user) {
+      return next(errorHandler(404, "User not found"));
+    }
 
-     // Find guest user by email
-  let findUser = await User.findById(userid);
-  findUser.contactedProperty.push(findProperty._id);
-  findUser.contactedPropertyModel=category === "rental" ? "Rent" : "PG"
-  await findUser.save();
-  // Update property with guest user ID
-  findProperty.contactByUser.push(findUser._id);
-  await findProperty.save();
-  
-  let { owner } = findProperty;
-  
-  let sendingStatus = await senOwnerDetailsOnMail(findUser.email, owner);
+    // Check if the property already exists in contactedProperty array
+    const alreadyContacted = user.contactedProperty.some(cp => cp.propertyId.equals(propertyid));
+    if (!alreadyContacted) {
+      user.contactedProperty.push({
+        propertyId: propertyid,
+        propertyType: category === "rental" ? "Rent" : "PG"
+      });
+      await user.save();
+    }
 
-  if (!sendingStatus.response) {
-    next(errorHandler(501, "server error please try again later"));
-  }
+    // Update Property model with user details
+    findProperty.contactByUser.push(userid);
+    await findProperty.save();
 
-  res.json({ msg: "check your mail,owner details sent successfully", success: true });
+    // Send owner details to user via email
+    const sendingStatus = await senOwnerDetailsOnMail(user.email, findProperty.owner);
+    if (!sendingStatus.response) {
+      return next(errorHandler(501, "Failed to send owner details. Please try again later."));
+    }
 
+    res.json({ msg: "Check your mail, owner details sent successfully", success: true });
 
   } catch (error) {
-    next(errorHandler(500,'internal server error'))
-    console.log('user get owner details failed',error)
+    console.error('User get owner details failed', error);
+    return next(errorHandler(500, 'Internal server error'));
   }
 };
 
