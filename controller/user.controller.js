@@ -339,6 +339,7 @@ const addFavoriteProperty = async (req, res, next) => {
     
 
     await user.save();
+    // console.log('updatedProperty',updatedProperty)
     
 
 
@@ -413,8 +414,9 @@ const removeFavoriteProperty = async (req, res, next) => {
     await user.save();
     const newproperty = await model.findById(propertyId);
     
+    console.log('newproperty',newproperty)
 
-    res.json({ msg: 'Property removed from favorites', user, success: true });
+    res.json({ msg: 'Property removed from favorites', user, success: true ,newproperty});
   } catch (error) {
     next(errorHandler(500, 'Internal server error'));
     console.log('Remove from favorite failed', error);
