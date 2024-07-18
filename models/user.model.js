@@ -39,15 +39,18 @@ const userSchema=mongoose.Schema({
         default: false
     },
     contactedProperty: [{
-        type: mongoose.Schema.Types.ObjectId,
-        refPath: 'contactedPropertyModel',
-        required: false
+        propertyId: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true
+          },
+          propertyType: {
+            type: String,
+            required: true,
+            enum: ['Rent', 'PG']
+          }
+
     }],
-    contactedPropertyModel: {
-        type: String,
-        required: false,
-        enum: ['Rent', 'PG']
-    },
+   
     userFavorites: [
         {
           propertyId: {
@@ -62,7 +65,7 @@ const userSchema=mongoose.Schema({
         }
       ]
    
-})
+},{timestamps:true})
 
 const User= mongoose.model('User',userSchema)
 

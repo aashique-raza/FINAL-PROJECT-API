@@ -137,8 +137,13 @@ const rentSchema = new mongoose.Schema({
     default: false
   },
   contactByUser: [{
+    type:mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Reference to User model for logged-in users
+    required: true
+  }],
+  contactByGuestUser: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'GuestUser',  // Use the model name as a string
+    ref: 'GuestUser', // Reference to GuestUser model for guest users
     required: true
   }],
   isPropertyFavorite: {
@@ -149,7 +154,7 @@ const rentSchema = new mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }]
-});
+},{timestamps:true});
 
 const Rent = mongoose.model('Rent', rentSchema);
 export default Rent;

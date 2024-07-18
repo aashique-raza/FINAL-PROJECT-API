@@ -116,10 +116,16 @@ availableFor:{
     type:Boolean,
     default:false
   },
-  contactByUser: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: GuestUser, // Reference to GuestUser model
-    required: true
+ 
+contactByUser: [{
+  type:mongoose.Schema.Types.ObjectId,
+  ref: 'User', // Reference to User model for logged-in users
+  required: true
+}],
+contactByGuestUser: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'GuestUser', // Reference to GuestUser model for guest users
+  required: true
 }],
 isPropertyFavorite: {
   type: Boolean,
@@ -130,7 +136,7 @@ addFavoritesByUser: [{
   ref: 'User'
 }]
 
-});
+},{timestamps:true});
 
 
 const PG=mongoose.model('pg',pgSchema)
