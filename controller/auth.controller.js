@@ -151,17 +151,46 @@ const google = async (req, res, next) => {
   try {
     const userexists = await User.findOne({ email });
     if (userexists) {
-      const token = jwt.sign(
-        { userId: userexists._id },
-        process.env.JWT_SECRET_KEY
-      );
+      /// Generate JWT access token with user data and expiration time of 1 day
+    const accessToken = jwt.sign(
+      { userId: userexists._id },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: '2m' }
+    );
+
+    // Generate JWT refresh token with user data and longer expiration time (for example, 30 days)
+    const refreshToken = jwt.sign(
+      { userId: userexists._id },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: '30d' }
+    );
+
+    userexists.refreshToken=refreshToken
+    await userexists.save()
+
+    // Set access token in HTTP-only cookie
+    const minutesInMilliseconds =  2 * 60 * 1000; // 3 days in milliseconds
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      maxAge: minutesInMilliseconds,
+      secure: true
+    });
+
+    // Set refresh token in secure HTTP-only cookie
+    const refreshMinutesInMilliseconds = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      maxAge: refreshMinutesInMilliseconds,
+      secure: true
+    });
+
       const { password, ...user } = userexists._doc;
-      res.cookie("token", token, { httpOnly: true });
-      return res.json({ success: true, msg: "login successfull", user,token });
+      
+      return res.json({ success: true, msg: "login successfull", user,tokens:{accessToken,refreshToken} });
     } else {
       const generatedPassword = generateRandomPassword();
       const hashedPassword = hashPassword(generatedPassword);
-      const defaultMobile = "0000000000"; // Default 10-digit mobile number
+      const defaultMobile = 9999999999; // Default 10-digit mobile number
       const newUser = new User({
         firstName,
         lastName,
@@ -169,16 +198,42 @@ const google = async (req, res, next) => {
         password: hashedPassword,
         profilePicture: googlePhotoUrl,
         isEmailVerified,
-        phoneNumber: parseInt(defaultMobile) // Set default mobile number
+        phoneNumber: defaultMobile // Set default mobile number
       });
       const savedUser = await newUser.save();
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: savedUser._id },
-        process.env.JWT_SECRET_KEY
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: '2m' }
       );
-      res.cookie("token", token, { httpOnly: true });
+  
+      // Generate JWT refresh token with user data and longer expiration time (for example, 30 days)
+      const refreshToken = jwt.sign(
+        { userId: savedUser._id },
+        process.env.JWT_REFRESH_SECRET_KEY,
+        { expiresIn: '30d' }
+      );
+  
+      savedUser.refreshToken=refreshToken
+      await savedUser.save()
+  
+      // Set access token in HTTP-only cookie
+      const minutesInMilliseconds =  2 * 60 * 1000; // 3 days in milliseconds
+      res.cookie("access_token", accessToken, {
+        httpOnly: true,
+        maxAge: minutesInMilliseconds,
+        secure: true
+      });
+  
+      // Set refresh token in secure HTTP-only cookie
+      const refreshMinutesInMilliseconds = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+      res.cookie("refresh_token", refreshToken, {
+        httpOnly: true,
+        maxAge: refreshMinutesInMilliseconds,
+        secure: true
+      });
       const { password, ...user } = savedUser._doc;
-      return res.json({ success: true, msg: "login successfull", user,token });
+      return res.json({ success: true, msg: "login successfull", user,tokens:{accessToken,refreshToken} });
     }
   } catch (error) {
     console.log(`google auth failed ${error}`);
