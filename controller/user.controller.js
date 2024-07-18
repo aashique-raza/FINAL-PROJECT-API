@@ -53,9 +53,15 @@ async function senOwnerDetailsOnMail(email,owner){
 
 
 const logOut = async (req, res) => {
+  const userId=req.user.userId
   try {
+
+    const user=await User.findById(userId)
+    user.refreshToken=null;
+    await user.save()
     // Clear the token cookie
     res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
 
     res.status(200).json({ success: true, msg: "Logged out successfully" });
   } catch (error) {
@@ -432,6 +438,51 @@ const removeFavoriteProperty = async (req, res, next) => {
 };
 
 
+const accessRefreshToken=async (req,res,next)=>{
+  console.log('token checkinhg...',req.body)
+  const  incomingRefreshToken  = req.body.refreshToken || req.cookie.refreshToken;
+  console.log('incomingRefreshToken',incomingRefreshToken)
+  if (!incomingRefreshToken) {
+    return next(errorHandler(403, "No refresh token provided"));
+  }
+
+  try {
+    const decoded =await jwt.verify(incomingRefreshToken, process.env.JWT_REFRESH_SECRET_KEY);
+    if(!decoded){
+      return next(errorHandler(403,'token expire or token used'))
+    }
+    const userId = decoded.userId;
+    const user=await User.findById(userId)
+
+    if(!user){
+      return next(errorHandler(403,'token expire or token used'))
+    }
+
+    if(incomingRefreshToken !== user?.refreshToken){
+      return next(errorHandler(403,'token expire or token used'))
+    }
+
+    const newAccessToken = jwt.sign(
+      { userId },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: '1h' }
+    );
+
+    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    res.cookie("access_token", newAccessToken, {
+      httpOnly: true,
+      maxAge: minutesInMilliseconds,
+      secure: true
+    });
+
+    res.status(200).json({ accessToken: newAccessToken,success:true,msg:'sucessfully genrated new access token' });
+  } catch (error) {
+    console.log(`Failed to refresh token ${error}`);
+    next(errorHandler(403, "Invalid refresh token"));
+  }
+}
+
+
 
 
 
@@ -447,5 +498,6 @@ export {
   userGetOwnerDetails,
   addFavoriteProperty,
   getFavoritesProperty,
-  removeFavoriteProperty
+  removeFavoriteProperty,
+  accessRefreshToken
 };

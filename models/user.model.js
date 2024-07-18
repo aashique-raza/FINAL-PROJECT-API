@@ -63,7 +63,11 @@ const userSchema=mongoose.Schema({
             enum: ['Rent', 'PG']
           }
         }
-      ]
+      ],
+
+      refreshToken:{
+        type:String
+      }
    
 },{timestamps:true})
 

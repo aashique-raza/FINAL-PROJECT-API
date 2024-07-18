@@ -101,19 +101,36 @@ const loginAccount = async (req, res, next) => {
       return next(errorHandler(401, "invalid credentials"));
     }
 
-    // Generate JWT token with user data and expiration time of 1 day
-    const token = jwt.sign(
+    /// Generate JWT access token with user data and expiration time of 1 day
+    const accessToken = jwt.sign(
       { userId: userExists._id },
       process.env.JWT_SECRET_KEY,
-      
+      { expiresIn: '2m' }
     );
-    // console.log(token)
-    // const minutesInMilliseconds = 1 * 60 * 1000; // 1 minute in milliseconds
-    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
-    res.cookie("access_token", token, {
+    // Generate JWT refresh token with user data and longer expiration time (for example, 30 days)
+    const refreshToken = jwt.sign(
+      { userId: userExists._id },
+      process.env.JWT_REFRESH_SECRET_KEY,
+      { expiresIn: '30d' }
+    );
+
+    userExists.refreshToken=refreshToken
+    await userExists.save()
+
+    // Set access token in HTTP-only cookie
+    const minutesInMilliseconds = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
+    res.cookie("access_token", accessToken, {
       httpOnly: true,
       maxAge: minutesInMilliseconds,
+      secure: true
+    });
+
+    // Set refresh token in secure HTTP-only cookie
+    const refreshMinutesInMilliseconds = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      maxAge: refreshMinutesInMilliseconds,
       secure: true
     });
 
@@ -121,7 +138,7 @@ const loginAccount = async (req, res, next) => {
 
     res
       .status(201)
-      .json({ success: true, msg: "login seccessfully", user, token });
+      .json({ success: true, msg: "login seccessfully", user, tokens:{accessToken,refreshToken} });
   } catch (error) {
     console.log(`failed login ${error}`);
     next(errorHandler(500, "internal server error"));

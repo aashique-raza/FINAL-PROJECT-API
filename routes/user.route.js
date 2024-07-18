@@ -10,15 +10,17 @@ import {
   userGetOwnerDetails,
   addFavoriteProperty,
   getFavoritesProperty,
-  removeFavoriteProperty
+  removeFavoriteProperty,
+  accessRefreshToken
 } from "../controller/user.controller.js";
 
 const router = Router();
 
-router.post("/logout-account", logOut);
+
+router.post("/logout-account", verifyUser,logOut);
 router.put("/update-account/:userID", verifyUser, updateAccount);
 router.patch("/change-password/:userID", verifyUser, changePassword);
-
+router.post('/refresh-token',accessRefreshToken)
 // verify user email
 router.post(
   "/send-verification-mail/:userID",
