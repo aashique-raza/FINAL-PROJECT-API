@@ -163,7 +163,7 @@ const getAllproperty = async (req, res, next) => {
     location,
     
   } = req.query;
-  // console.log(req.query);
+  console.log(req.query);
 
   // return res.json({msg:'data aa rha hai'})
   try {
