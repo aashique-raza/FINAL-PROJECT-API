@@ -444,15 +444,23 @@ const userContactProperty=async(req,res,next)=>{
     if (req.user.userId !== userId) {
       return next(errorHandler(403, "unauthorized request"));
     }
-    const user = await User.findById(userId).populate('contactedProperty');
+    const user = await User.findById(userId).populate('contactedProperty.propertyId');
 
     if (!user) {
       return next(errorHandler(404, 'User not found'));
     }
 
-    console.log('user property',user)
+    // Manually populate contacted properties
+    const contactedProperty = await Promise.all(user.contactedProperty.map(async (contact) => {
+      const propertyModel = contact.propertyType === 'PG' ? PG : Rent;
+      const propertyDetails = await propertyModel.findById(contact.propertyId);
+      return {
+        ...contact.toObject(),
+        propertyDetails
+      };
+    }));
 
-    const{contactedProperty}=user
+    console.log('property',contactedProperty)
 
 
     res.json({ msg: 'user contact property found', contactedProperty, success: true });
