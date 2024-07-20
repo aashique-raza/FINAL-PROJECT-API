@@ -38,6 +38,19 @@ const userSchema=mongoose.Schema({
         type: Boolean,
         default: false
     },
+    userProperty:[
+      {
+        propertyId: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true
+        },
+        propertyType: {
+          type: String,
+          required: true,
+          enum: ['Rent', 'PG']
+        }
+      }
+    ],
     contactedProperty: [{
         propertyId: {
             type: mongoose.Schema.Types.ObjectId,
