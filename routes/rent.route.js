@@ -35,7 +35,7 @@ router.get("/property", getAllproperty);
 
 // protected route---
 router.post(
-  "/create",
+  "/create/:userId",
   verifyUser,
   upload.array("listingPhotos"),
   createRentProperty

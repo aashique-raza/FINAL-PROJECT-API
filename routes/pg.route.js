@@ -33,7 +33,7 @@ router.get("/allProperty", getProperty);
 
 // proetected route
 router.post(
-  "/create-listing",
+  "/create-listing/:userId",
   verifyUser,
   checkEmailVerification,
   upload.array("listingPhotos"),

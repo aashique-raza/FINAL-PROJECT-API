@@ -9,6 +9,7 @@ const createRentProperty = async (req, res, next) => {
   // console.log("files", req.files);
   //   return res.json({msg:"testing...."})
 
+  const {userId}=req.params
   const {
     apartmentName,
     apartmentType,
@@ -44,6 +45,15 @@ const createRentProperty = async (req, res, next) => {
   console.log(electricity, waterSupply);
 
   try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    
+    const findUser=await User.findById(req.user.userId)
+
+    if(!findUser){
+      next(errorHandler(404,'user not found'))
+    }
     if (bedroom == 0) {
       return next(errorHandler(403, "bedroom is required field"));
     }
@@ -205,6 +215,14 @@ const createRentProperty = async (req, res, next) => {
     });
 
     const saveProperty = await createNewProperty.save();
+
+   
+    findUser.userProperty.push({
+      propertyId: saveProperty._id,
+      propertyType: 'Rent'
+    });
+
+    await findUser.save();
 
     res
       .status(201)

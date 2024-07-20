@@ -32,9 +32,20 @@ const addPgProperty = async (req, res, next) => {
     roomFacilities,
   } = req.body;
 
+  const {userId}=req.params
+  console.log('params',req.params)
   // console.log(rentAmount,depositAmount,typeof rentAmount, typeof depositAmount)
 
   try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    
+    const findUser=await User.findById(req.user.userId)
+
+    if(!findUser){
+      next(errorHandler(404,'user not found'))
+    }
     let rentAMountNumber;
     let depositAmountNumber;
     if (rentAmount) {
@@ -115,6 +126,7 @@ const addPgProperty = async (req, res, next) => {
       return next(errorHandler(500, "internal server error"));
     }
 
+
     const newListing = new PG({
       owner: req.user.userId,
       roomSharing,
@@ -144,6 +156,14 @@ const addPgProperty = async (req, res, next) => {
     });
 
     const lsiting = await newListing.save();
+
+  
+    findUser.userProperty.push({
+      propertyId: lsiting._id,
+      propertyType: 'PG'
+    });
+
+    await findUser.save();
 
     res.json({ success: true, msg: "create listing successfull", lsiting });
   } catch (error) {
