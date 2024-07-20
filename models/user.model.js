@@ -48,7 +48,11 @@ const userSchema=mongoose.Schema({
           type: String,
           required: true,
           enum: ['Rent', 'PG']
-        }
+        },
+        date:{
+          type:Date,
+          default:Date.now
+        }  
       }
     ],
     contactedProperty: [{
@@ -60,8 +64,11 @@ const userSchema=mongoose.Schema({
             type: String,
             required: true,
             enum: ['Rent', 'PG']
-          }
-
+          },
+          date:{
+            type:Date,
+            default:Date.now
+          }  
     }],
    
     userFavorites: [
@@ -74,8 +81,13 @@ const userSchema=mongoose.Schema({
             type: String,
             required: true,
             enum: ['Rent', 'PG']
-          }
+          },
+          date:{
+            type:Date,
+            default:Date.now
+          }  
         }
+       
       ],
 
       refreshToken:{
