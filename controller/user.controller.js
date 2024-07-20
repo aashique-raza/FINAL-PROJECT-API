@@ -437,6 +437,31 @@ const removeFavoriteProperty = async (req, res, next) => {
   }
 };
 
+const userContactProperty=async(req,res,next)=>{
+  const{userId}=req.params 
+  
+  try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    const user = await User.findById(userId).populate('contactedProperty');
+
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    console.log('user property',user)
+
+    const{contactedProperty}=user
+
+
+    res.json({ msg: 'user contact property found', contactedProperty, success: true });
+  } catch (error) {
+    next(errorHandler(500, 'Internal server error'));
+    console.log('user contact property failed', error);
+  }
+}
+
 
 const accessRefreshToken=async (req,res,next)=>{
   // console.log('token checkinhg...',req.body)
@@ -489,6 +514,7 @@ const accessRefreshToken=async (req,res,next)=>{
 
 
 export {
+  userContactProperty,
   updateAccount,
   logOut,
   changePassword,

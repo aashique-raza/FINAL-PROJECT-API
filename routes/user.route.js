@@ -11,7 +11,8 @@ import {
   addFavoriteProperty,
   getFavoritesProperty,
   removeFavoriteProperty,
-  accessRefreshToken
+  accessRefreshToken,
+  userContactProperty
 } from "../controller/user.controller.js";
 
 const router = Router();
@@ -49,5 +50,9 @@ router.get("/getFavorites/:userId/", verifyUser,getFavoritesProperty);
 // remove from favrouite list__________
 
 router.delete('/removeFromeFavrouiteList/:userId',verifyUser,removeFavoriteProperty)
+
+// user contact property get---------------
+
+router.get('/contacted-property/:userId',verifyUser,userContactProperty)
 
 export default router;
