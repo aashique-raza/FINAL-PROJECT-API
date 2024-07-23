@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-// import errorHandler from "../error/errorHandler";
+import errorHandler from "../error/errorHandler";
 
 const verifyUser = async (req, res, next) => {
   try {
@@ -17,6 +17,7 @@ const verifyUser = async (req, res, next) => {
         console.log(token)
     if (!token) {
      
+      
       res
         .status(401)
         .json({ success: false, msg: "unauthorized request" });
