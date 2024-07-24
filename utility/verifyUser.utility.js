@@ -18,10 +18,8 @@ const verifyUser = async (req, res, next) => {
         console.log(token)
     if (!token) {
      
+      next(errorHandler("unauthorized request",401))
       
-      res
-        .status(401)
-        .json({ success: false, msg: "unauthorized request" });
         return 
     }
 
@@ -31,12 +29,8 @@ const verifyUser = async (req, res, next) => {
     console.log('decoded token',decoded)
 
     if (!decoded) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          msg: "provided wrong token please login again",
-        });
+      next(errorHandler(401,'provided wrong token please login again'))
+      return 
     }
 
     // Store user information in request object for further use
@@ -45,10 +39,9 @@ const verifyUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(`failed to verify user`,error);
+    next(errorHandler(500,'internal server error'))
     // console.log(error.message);
-    return res
-      .status(401)
-      .json({ success: false, msg: "Unauthorized. Please log in again." });
+    
   }
 };
 
