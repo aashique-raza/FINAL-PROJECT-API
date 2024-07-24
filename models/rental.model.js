@@ -146,10 +146,7 @@ const rentSchema = new mongoose.Schema({
     ref: 'GuestUser', // Reference to GuestUser model for guest users
     required: true
   }],
-  isPropertyFavorite: {
-    type: Boolean,
-    default: false
-  },
+ 
   addFavoritesByUser: [{
     type:mongoose.Schema.Types.ObjectId,
     ref: 'User'

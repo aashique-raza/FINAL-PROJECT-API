@@ -18,7 +18,7 @@ const verifyUser = async (req, res, next) => {
         console.log(token)
     if (!token) {
      
-      next(errorHandler("unauthorized request",401))
+      next(errorHandler(401,"unauthorized request"))
       
         return 
     }
@@ -39,7 +39,7 @@ const verifyUser = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(`failed to verify user`,error);
-    next(errorHandler(500,'internal server error'))
+    next(errorHandler(401,"unauthorized request"))
     // console.log(error.message);
     
   }

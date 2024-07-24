@@ -325,39 +325,39 @@ const userGetOwnerDetails = async (req, res, next) => {
 
 const addFavoriteProperty = async (req, res, next) => {
   const { userId } = req.params;
-  const { propertyId, category } = req.body; // propertyType should be 'Rent' or 'PG'
- 
+  const { propertyId, category } = req.body;
 
   try {
     if (req.user.userId !== userId) {
       return next(errorHandler(403, "unauthorized request"));
     }
+
     const user = await User.findById(userId);
 
     if (!user) {
       return next(errorHandler(404, 'User not found'));
     }
 
-    user.userFavorites.push({
-      propertyId,
-      propertyType: category === 'rental' ? 'Rent' : 'PG'
-    });
+    const favoriteExists = user.userFavorites.some(favorite => favorite.propertyId.toString() === propertyId);
 
-    
-    const model = category === 'rental' ? Rent : PG;
-   const updatedProperty= await model.findByIdAndUpdate(propertyId, { 
-      isPropertyFavorite: true,
-      $addToSet: { addFavoritesByUser: userId } // Prevents duplicates
-    },{new:true});
+    if (!favoriteExists) {
+      user.userFavorites.push({
+        propertyId,
+        propertyType: category === 'rental' ? 'Rent' : 'PG',
+        isFavorite: true
+      });
 
-    
+      await user.save();
 
-    await user.save();
-    // console.log('updatedProperty',updatedProperty)
-    
+      const updatedProperty = await (category === 'rental' ? Rent : PG).findByIdAndUpdate(propertyId, {
+        isPropertyFavorite: true,
+        $addToSet: { addFavoritesByUser: userId }
+      }, { new: true });
 
-
-    res.json({ msg: 'Property added to favorites', user, success: true,updatedProperty });
+      res.json({ msg: 'Property added to favorites', updatedProperty, success: true });
+    } else {
+      res.status(400).json({ msg: 'Property already in favorites' });
+    }
   } catch (error) {
     next(errorHandler(500, 'Internal server error'));
     console.log('Add to favorite failed', error);
@@ -365,77 +365,62 @@ const addFavoriteProperty = async (req, res, next) => {
 };
 
 
-const getFavoritesProperty = async (req, res, next) => {
-  const { userId } = req.params;
- 
-
-  try {
-    if (req.user.userId !== userId) {
-      return next(errorHandler(403, "unauthorized request"));
-    }
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return next(errorHandler(404, 'User not found'));
-    }
-
-    // Fetch all favorite properties
-    const favoriteProperties = await Promise.all(user.userFavorites.map(async (favorite) => {
-      const model = favorite.propertyType === 'Rent' ? Rent : PG;
-      const property = await model.findById(favorite.propertyId);
-      return property ? { ...property.toObject(), propertyType: favorite.propertyType } : null;
-    }));
-    // console.log(favoriteProperties)
-
-    res.json({ msg: 'All properties fetched', favorites: favoriteProperties.filter(fav => fav !== null), success: true });
-  } catch (error) {
-    next(errorHandler(500, 'Internal server error'));
-    console.log('Getting favorite property failed', error);
-  }
-};
-
 const removeFavoriteProperty = async (req, res, next) => {
   const { userId } = req.params;
-  const { propertyId, category } = req.body; // propertyType should be 'Rent' or 'PG'
-  
+  const { propertyId } = req.body;
 
   try {
     if (req.user.userId !== userId) {
       return next(errorHandler(403, "unauthorized request"));
     }
+
     const user = await User.findById(userId);
 
     if (!user) {
       return next(errorHandler(404, 'User not found'));
     }
 
-    // Remove the property from the user's favorites
     user.userFavorites = user.userFavorites.filter(favorite => favorite.propertyId.toString() !== propertyId);
 
-    // Determine the model to use based on propertyType
-    const model = category === 'rental' ? Rent : PG;
-
-    // Find the property and update its isPropertyFavorite field and remove the user from addFavoritesByUser
-    const property = await model.findById(propertyId);
-   
-    if (property) {
-      property.isPropertyFavorite = false;
-      property.addFavoritesByUser = property.addFavoritesByUser.filter(favUserId => favUserId.toString() !== userId);
-      await property.save();
-    }
-
     await user.save();
-    const newproperty = await model.findById(propertyId);
-    
-    console.log('newproperty',newproperty)
 
-    res.json({ msg: 'Property removed from favorites', user, success: true ,newproperty});
+    const updatedProperty = await (propertyId.propertyType === 'rental' ? Rent : PG).findByIdAndUpdate(propertyId, {
+      isPropertyFavorite: false,
+      $pull: { addFavoritesByUser: userId }
+    }, { new: true });
+
+    res.json({ msg: 'Property removed from favorites', updatedProperty, success: true });
   } catch (error) {
     next(errorHandler(500, 'Internal server error'));
     console.log('Remove from favorite failed', error);
   }
 };
+
+
+
+
+
+const getFavoritesProperty = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    if (req.user.userId !== userId) {
+      return next(errorHandler(403, "unauthorized request"));
+    }
+    const user = await User.findById(userId).populate('userFavorites.propertyId');
+
+    if (!user) {
+      return next(errorHandler(404, 'User not found'));
+    }
+
+    res.json({ favorites: user.userFavorites });
+  } catch (error) {
+    next(errorHandler(500, 'Internal server error'));
+    console.log('Get favorites failed', error);
+  }
+};
+
+
 
 const userContactProperty=async(req,res,next)=>{
   const{userId}=req.params 
