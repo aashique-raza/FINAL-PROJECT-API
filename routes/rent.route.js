@@ -11,8 +11,7 @@ import {
   handleActivationProperty,
 } from "../controller/rent.controller.js";
 import multer from "multer";
-// import { getUserProperty } from '../controller/pg.controller.js';
-// import { getAllproperty } from '../controller/pg.controller.js';
+import checkEmailVerification from "../middlewares/mailVerified.middleware.js";
 
 /* Configuration Multer for File Upload */
 const storage = multer.diskStorage({
@@ -37,6 +36,7 @@ router.get("/property", getAllproperty);
 router.post(
   "/create/:userId",
   verifyUser,
+  checkEmailVerification,
   upload.array("listingPhotos"),
   createRentProperty
 );
