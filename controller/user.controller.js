@@ -408,6 +408,7 @@ const getFavoritesProperty = async (req, res, next) => {
       return next(errorHandler(403, "unauthorized request"));
     }
     const user = await User.findById(userId).populate('userFavorites.propertyId');
+    console.log('user',user)
 
     if (!user) {
       return next(errorHandler(404, 'User not found'));
