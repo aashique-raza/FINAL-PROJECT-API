@@ -405,18 +405,46 @@ const getFavoritesProperty = async (req, res, next) => {
 
   try {
     if (req.user.userId !== userId) {
-      return next(errorHandler(403, "unauthorized request"));
+      return next(errorHandler(403, "Unauthorized request"));
     }
-    const user = await User.findById(userId).populate('userFavorites.propertyId');
-    console.log('user',user)
+
+    const user = await User.findById(userId);
 
     if (!user) {
       return next(errorHandler(404, 'User not found'));
     }
 
-    res.json({ favorites: user.userFavorites });
+    let allFavouriteData = [];
+
+    const populatedFavorites = await Promise.all(user.userFavorites.map(async (favorite) => {
+      let data = null;
+
+      if (favorite.propertyType === 'Rent') {
+        data = await Rent.findById(favorite.propertyId);
+      } else if (favorite.propertyType === 'PG') {
+        data = await PG.findById(favorite.propertyId);
+      }
+
+      if (!data) {
+        // If the property is not found, throw an error
+        next(errorHandler(404,'favourite property not found'))
+        return
+        
+      }
+
+      allFavouriteData.push(data);
+      return favorite;
+    }));
+
+    // console.log('All favorite properties:', allFavouriteData);
+
+    res.json({ favorites: allFavouriteData ,success:true,msg:'property found'});
   } catch (error) {
-    next(errorHandler(500, 'Internal server error'));
+    if (error.message.startsWith('Property not found')) {
+      return next(errorHandler(404, error.message));
+    } else {
+      next(errorHandler(500, 'Internal server error'));
+    }
     console.log('Get favorites failed', error);
   }
 };
