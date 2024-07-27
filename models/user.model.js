@@ -22,7 +22,7 @@ const userSchema=mongoose.Schema({
     phoneNumber:{
         type:Number,
         required:true,
-        // unique:true,
+        unique:false,
     },
     password:{
         type:String,
