@@ -7,6 +7,22 @@ import User from "../models/user.model.js";
 
 // next(errorHandler(403,'please fill all required field'))
 
+// Function to find similar properties based on roomSharing and location.city
+const findSimilarProperties = async (roomSharing, city, excludeId) => {
+  try {
+    const similarProperties = await PG.find({
+      _id: { $ne: excludeId },
+      roomSharing: roomSharing,
+      'location.city': city
+    }).populate('owner', '-password');
+
+    return similarProperties;
+  } catch (error) {
+    console.log('Failed fetching similar properties', error.message);
+    return [];
+  }
+};
+
 const addPgProperty = async (req, res, next) => {
   const {
     roomSharing,
@@ -265,8 +281,12 @@ try {
   if(!findProperty){
     return next(errorHandler(403,'property not found'))
   }
+
+  // Find similar properties based on roomSharing and location.city
+  const similarProperties = await findSimilarProperties(findProperty.roomSharing, findProperty.location.city, id);
+  console.log('similar properties',similarProperties)
   
-  res.json({success:true,msg:'property found',findProperty})
+  res.json({success:true,msg:'property found',findProperty,similarProperties })
 } catch (error) {
   next(errorHandler(500,'internal server error'))
   console.log('failed fetahcing sibgle property',error.message)
