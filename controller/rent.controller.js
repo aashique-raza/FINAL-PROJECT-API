@@ -296,11 +296,12 @@ const getRentalProperty = async (req, res, next) => {
   }
 };
 // Function to find similar properties based on roomSharing and location.city
-const findSimilarProperties = async (roomSharing, city, excludeId) => {
+const findSimilarProperties = async (bhkType, city, excludeId) => {
+  console.log('bhk type',bhkType,'city',city,'id',excludeId)
   try {
-    const similarProperties = await PG.find({
+    const similarProperties = await Rent.find({
       _id: { $ne: excludeId },
-      roomSharing: roomSharing,
+      BHKType: bhkType,
       'location.city': city
     }).populate('owner', '-password');
 
@@ -325,7 +326,7 @@ const getSinglePropertyById = async (req, res, next) => {
       return next(errorHandler(403, "property not found"));
     }
     // Find similar properties based on roomSharing and location.city
-  const similarProperties = await findSimilarProperties(findProperty.roomSharing, findProperty.location.city, id);
+  const similarProperties = await findSimilarProperties(findProperty.BHKType, findProperty.location.city, id);
   console.log('similar properties',similarProperties)
 
     res.json({ success: true, msg: "property found", findProperty,similarProperties });
