@@ -191,13 +191,12 @@ const sendVerifivationMail = async (req, res, next) => {
         token: token,
       });
     } else {
-      return res
-        .status(200)
-        .json({ success: false, msg: "please try again later" });
+      return next(errorHandler(500,'internal server error'))
     }
   } catch (error) {
     console.error("Error sending verification email:", error);
-    res.status(500).json({ success: false, message: "Internal server error." });
+    next(errorHandler(500,'internal server error'))
+    
   }
 };
 
