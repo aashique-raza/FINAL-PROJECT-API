@@ -74,7 +74,7 @@ const createAccount = async (req, res, next) => {
 
 const loginAccount = async (req, res, next) => {
   const { email, password } = req.body;
-  console.log(email,password)
+  // console.log(typeof email,password)
   let number;
   try {
     if (!email || !password) {
@@ -84,6 +84,11 @@ const loginAccount = async (req, res, next) => {
     // check if email is actually a number
     if (typeof email === "number") {
       number = email;
+    }
+    if( typeof email ==="string"){
+      if(!email.includes('@')){
+        number = email;
+      }
     }
     const userExists = await User.findOne({
       $or: [{ email: email }, { phoneNumber: number }],
@@ -101,7 +106,7 @@ const loginAccount = async (req, res, next) => {
       return next(errorHandler(401, "invalid credentials"));
     }
 
-    /// Generate JWT access token with user data and expiration time of 1 day
+    /// Generate JWT access token with user data and expiration time of 2m
     const accessToken = jwt.sign(
       { userId: userExists._id },
       process.env.JWT_SECRET_KEY,
@@ -119,7 +124,7 @@ const loginAccount = async (req, res, next) => {
     await userExists.save()
 
     // Set access token in HTTP-only cookie
-    const minutesInMilliseconds =  2 * 60 * 1000; // 3 days in milliseconds
+    const minutesInMilliseconds =  2 * 60 * 1000; // 2 min in milliseconds
     res.cookie("access_token", accessToken, {
       httpOnly: true,
       maxAge: minutesInMilliseconds,
