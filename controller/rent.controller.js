@@ -5,9 +5,7 @@ import Rent from "../models/rental.model.js";
 import User from "../models/user.model.js";
 
 const createRentProperty = async (req, res, next) => {
-  // console.log("body", req.body);
-  // console.log("files", req.files);
-  //   return res.json({msg:"testing...."})
+
 
   const {userId}=req.params
   const {
@@ -41,8 +39,7 @@ const createRentProperty = async (req, res, next) => {
     waterSupply,
   } = req.body;
 
-  console.log(typeof electricity, typeof waterSupply);
-  console.log(electricity, waterSupply);
+ 
 
   try {
     if (req.user.userId !== userId) {
