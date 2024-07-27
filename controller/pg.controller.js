@@ -33,7 +33,7 @@ const addPgProperty = async (req, res, next) => {
   } = req.body;
 
   const {userId}=req.params
-  console.log('params',req.params)
+  // console.log('params',req.params)
   // console.log(rentAmount,depositAmount,typeof rentAmount, typeof depositAmount)
 
   try {
