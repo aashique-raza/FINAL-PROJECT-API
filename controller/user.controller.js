@@ -73,6 +73,7 @@ const logOut = async (req, res) => {
 const updateAccount = async (req, res, next) => {
   const { firstName, lastName, email, phoneNumber, profileImage } = req.body;
 
+  
   const { userID } = req.params;
 
   try {
@@ -104,16 +105,14 @@ const updateAccount = async (req, res, next) => {
       },
       { new: true }
     );
-    // console.log(updatedUser)
-
-    //   const { password: pass, ...user } = updatedUser._doc;
+ 
 
     res
       .status(200)
       .json({ success: true, msg: "user successfully updated", updatedUser });
   } catch (error) {
     console.log(error);
-    next(errorHandler(500, " server error"));
+    next(errorHandler(500, "internal server error"));
   }
 };
 
