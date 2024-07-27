@@ -365,8 +365,8 @@ const addFavoriteProperty = async (req, res, next) => {
 
 const removeFavoriteProperty = async (req, res, next) => {
   const { userId } = req.params;
-  const { propertyId } = req.body;
-
+  const { propertyId, category } = req.body;
+console.log(category)
   try {
     if (req.user.userId !== userId) {
       return next(errorHandler(403, "unauthorized request"));
@@ -378,14 +378,20 @@ const removeFavoriteProperty = async (req, res, next) => {
       return next(errorHandler(404, 'User not found'));
     }
 
+    // Remove property from user's favorites
     user.userFavorites = user.userFavorites.filter(favorite => favorite.propertyId.toString() !== propertyId);
 
     await user.save();
 
-    const updatedProperty = await (propertyId.propertyType === 'rental' ? Rent : PG).findByIdAndUpdate(propertyId, {
-      isPropertyFavorite: false,
+    // Check property type and update accordingly
+    const propertyModel = category === 'rental' ? Rent : PG;
+    const updatedProperty = await propertyModel.findByIdAndUpdate(propertyId, {
       $pull: { addFavoritesByUser: userId }
     }, { new: true });
+
+    if (!updatedProperty) {
+      return next(errorHandler(404, 'Property not found'));
+    }
 
     res.json({ msg: 'Property removed from favorites', updatedProperty, success: true });
   } catch (error) {
@@ -393,6 +399,7 @@ const removeFavoriteProperty = async (req, res, next) => {
     console.log('Remove from favorite failed', error);
   }
 };
+
 
 
 
