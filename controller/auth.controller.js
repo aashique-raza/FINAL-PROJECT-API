@@ -22,7 +22,7 @@ const createAccount = async (req, res, next) => {
   try {
     const mobileNumber = parseInt(phoneNumber);
 
-    // Check if user already exists
+
     const existsEmail = await User.findOne({ email: email });
     if (existsEmail) {
       return next(errorHandler(403, "user already exists"));
